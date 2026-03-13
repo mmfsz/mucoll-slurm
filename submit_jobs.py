@@ -1,22 +1,28 @@
+import argparse
 import os
 import subprocess
 import sys
 
+# --- Paths (derived from this script's location) ---
+SLURM_DIR = os.path.dirname(os.path.abspath(__file__))
+MUONCOLLIDER_DIR = os.path.dirname(SLURM_DIR)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-o", "--output", default="output/batch",
+                    help="Output directory relative to MUONCOLLIDER_DIR (default: output/batch)")
+args = parser.parse_args()
+
 # --- Configuration ---
-NUM_JOBS = 1                # Number of jobs to submit
-NEVENTS_PER_JOB = 10       # Events per job
-OUTPUT_BASE_DIR = "/oscar/data/mleblan6/mucoll/batch_output"
-WORK_DIR = "/users/mleblan6/work/bib"
-MUCOLL_BENCHMARKS_PATH = os.path.join(WORK_DIR, "mucoll-benchmarks")
-SCRIPT_PATH = os.path.join(WORK_DIR, "mucoll-slurm/run_chain_pgun.sh")
-# SCRIPT_PATH = os.path.join(WORK_DIR, "mucoll-slurm/run_chain_WWZ_hadronic.sh")
-# SCRIPT_PATH = os.path.join(WORK_DIR, "mucoll-slurm/run_chain_ZZZ_hadronic.sh")
-#APPTAINER_IMAGE = "docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main" 
-# I have already pulled the image and converted it to a SIF, so we can use the local SIF directly to save time and bandwidth.
-# I did this with the following command:
-# apptainer pull --name mucoll-sim-ubuntu24:main.sif docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main
-APPTAINER_IMAGE = "/oscar/data/mleblan6/mucoll/mucoll-sim-ubuntu24:main.sif"
-DATA_DIR_TO_BIND = "/oscar/data/mleblan6/mucoll"
+NUM_JOBS = 100            # Number of jobs to submit
+NEVENTS_PER_JOB = 10      # Events per job
+OUTPUT_BASE_DIR = os.path.join(MUONCOLLIDER_DIR, args.output)
+MUCOLL_BENCHMARKS_PATH = os.path.join(MUONCOLLIDER_DIR, "mucoll-benchmarks")
+# SCRIPT_PATH = os.path.join(SLURM_DIR, "run_chain_pgun.sh")
+# SCRIPT_PATH = os.path.join(SLURM_DIR, "run_chain_WWZ_hadronic.sh")
+# SCRIPT_PATH = os.path.join(SLURM_DIR, "run_chain_ZZZ_hadronic.sh")
+SCRIPT_PATH = os.path.join(SLURM_DIR, "run_chain_ZH.sh")
+
+APPTAINER_IMAGE = os.path.join(SLURM_DIR, "mucoll-sim.sif")
 
 # --- Validation ---
 if not os.path.exists(MUCOLL_BENCHMARKS_PATH):
@@ -25,6 +31,12 @@ if not os.path.exists(MUCOLL_BENCHMARKS_PATH):
 
 if not os.path.exists(SCRIPT_PATH):
     print(f"Error: Script not found: {SCRIPT_PATH}")
+    sys.exit(1)
+
+if not os.path.exists(APPTAINER_IMAGE):
+    print(f"Error: Container image not found: {APPTAINER_IMAGE}")
+    print(f"Pull it first with:")
+    print(f"  apptainer pull {APPTAINER_IMAGE} docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main")
     sys.exit(1)
 
 # Ensure script is executable
@@ -40,14 +52,13 @@ for job_id in range(NUM_JOBS):
     job_name = f"mucoll_job_{job_id}"
     log_dir = os.path.join(OUTPUT_BASE_DIR, "logs")
     os.makedirs(log_dir, exist_ok=True)
-    
+
     # Slurm script content
-    # We bind the data directory so it's accessible inside the container
     slurm_script = f"""#!/bin/bash
 #SBATCH --job-name={job_name}
 #SBATCH --output={log_dir}/job_{job_id}.out
 #SBATCH --error={log_dir}/job_{job_id}.err
-#SBATCH --time=04:00:00
+#SBATCH --time=10:00:00
 #SBATCH --mem=16G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -56,15 +67,14 @@ for job_id in range(NUM_JOBS):
 echo "Running on host: $(hostname)"
 echo "Job ID: {job_id}"
 
-# Run the container
-# We bind the data directory explicitly, and the work directory to ensure all scripts are found
-apptainer exec --bind {DATA_DIR_TO_BIND},{WORK_DIR} {APPTAINER_IMAGE} bash {SCRIPT_PATH} {job_id} {NEVENTS_PER_JOB} {OUTPUT_BASE_DIR} {MUCOLL_BENCHMARKS_PATH}
+# Run the container (--cleanenv prevents host Python env vars from breaking container Python)
+apptainer exec --cleanenv --bind {MUONCOLLIDER_DIR} {APPTAINER_IMAGE} bash {SCRIPT_PATH} {job_id} {NEVENTS_PER_JOB} {OUTPUT_BASE_DIR} {MUCOLL_BENCHMARKS_PATH}
 """
-    
+
     script_filename = f"submit_job_{job_id}.sh"
     with open(script_filename, "w") as f:
         f.write(slurm_script)
-        
+
     # Submit the job
     try:
         # subprocess.run("cat " + script_filename, shell=True, check=True)

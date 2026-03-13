@@ -16,8 +16,9 @@ echo "Output directory: $OUTPUT_DIR"
 echo "Benchmarks path: $MUCOLL_BENCHMARKS_PATH"
 echo "Particle: PDG=$PDG, pT=$PT GeV, Theta=[$THETA_MIN, $THETA_MAX]"
 
-# Source the main environment setup inside the container. This is the one that was moved from mucoll-slurm/ when setting up the work directory.
-source $MUCOLL_BENCHMARKS_PATH/../setup.sh
+# Source the main environment setup
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/scripts/setup.sh"
 
 # Setup detector geometry and PYTHONPATH for digi/reco steering files.
 # Source setup_digireco.sh from its location, passing the benchmarks path directly

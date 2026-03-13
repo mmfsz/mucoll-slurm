@@ -3,19 +3,17 @@ import subprocess
 import sys
 import itertools
 
+# --- Paths (derived from this script's location) ---
+SLURM_DIR = os.path.dirname(os.path.abspath(__file__))
+MUONCOLLIDER_DIR = os.path.dirname(SLURM_DIR)
+
 # --- Configuration ---
 NUM_JOBS_PER_POINT = 2      # Number of jobs to submit per scan point
 NEVENTS_PER_JOB = 1000       # Events per job
-OUTPUT_BASE_DIR = "/oscar/data/mleblan6/mucoll/batch_output/test_scan"
-WORK_DIR = "/users/mleblan6/work/bib"
-MUCOLL_BENCHMARKS_PATH = os.path.join(WORK_DIR, "mucoll-benchmarks")
-SCRIPT_PATH = os.path.join(WORK_DIR, "mucoll-slurm/run_chain_pgun.sh")
-#APPTAINER_IMAGE = "docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main"
-# I have already pulled the image and converted it to a SIF, so we can use the local SIF directly to save time and bandwidth.
-# I did this with the following command:
-# apptainer pull --name mucoll-sim-ubuntu24:main.sif docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main
-APPTAINER_IMAGE = "/oscar/data/mleblan6/mucoll/mucoll-sim-ubuntu24:main.sif"
-DATA_DIR_TO_BIND = "/oscar/data/mleblan6/mucoll"
+OUTPUT_BASE_DIR = os.path.join(MUONCOLLIDER_DIR, "output/scan")
+MUCOLL_BENCHMARKS_PATH = os.path.join(MUONCOLLIDER_DIR, "mucoll-benchmarks")
+SCRIPT_PATH = os.path.join(SLURM_DIR, "run_chain.sh")
+APPTAINER_IMAGE = os.path.join(SLURM_DIR, "mucoll-sim.sif")
 
 # --- Scan Parameters ---
 # Define the lists of parameters to scan over
@@ -30,6 +28,12 @@ if not os.path.exists(MUCOLL_BENCHMARKS_PATH):
 
 if not os.path.exists(SCRIPT_PATH):
     print(f"Error: Script not found: {SCRIPT_PATH}")
+    sys.exit(1)
+
+if not os.path.exists(APPTAINER_IMAGE):
+    print(f"Error: Container image not found: {APPTAINER_IMAGE}")
+    print(f"Pull it first with:")
+    print(f"  apptainer pull {APPTAINER_IMAGE} docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main")
     sys.exit(1)
 
 # Ensure script is executable
@@ -59,13 +63,13 @@ for pdg, pt, (theta_min, theta_max) in combinations:
     config_dir = os.path.join(OUTPUT_BASE_DIR, config_name)
     log_dir = os.path.join(config_dir, "logs")
     os.makedirs(log_dir, exist_ok=True)
-    
+
     print(f"Submitting for {config_name}...")
 
     for i in range(NUM_JOBS_PER_POINT):
         job_id = job_counter
         job_name = f"mc_{config_name}_{i}"
-        
+
         # Slurm script content
         slurm_script = f"""#!/bin/bash
 #SBATCH --job-name={job_name}
@@ -82,14 +86,13 @@ echo "Job Index: {i}"
 echo "Configuration: PDG={pdg}, pT={pt}, Theta=[{theta_min}, {theta_max}]"
 
 # Run the container
-# We bind the data directory explicitly, and the work directory
-apptainer exec --bind {DATA_DIR_TO_BIND},{WORK_DIR} {APPTAINER_IMAGE} bash {SCRIPT_PATH} {i} {NEVENTS_PER_JOB} {config_dir} {MUCOLL_BENCHMARKS_PATH} {pdg} {pt} {theta_min} {theta_max}
+apptainer exec --bind {MUONCOLLIDER_DIR} {APPTAINER_IMAGE} bash {SCRIPT_PATH} {i} {NEVENTS_PER_JOB} {config_dir} {MUCOLL_BENCHMARKS_PATH} {pdg} {pt} {theta_min} {theta_max}
 """
-        
+
         script_filename = f"submit_{config_name}_{i}.sh"
         with open(script_filename, "w") as f:
             f.write(slurm_script)
-            
+
         # Submit the job
         try:
             result = subprocess.run(["sbatch", script_filename], capture_output=True, text=True, check=True)
