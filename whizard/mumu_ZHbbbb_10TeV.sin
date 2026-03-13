@@ -1,0 +1,65 @@
+# mumu_ZH_schannel_10TeV
+########################################################################
+# mu+mu- -> ZH (s-channel) at 10 TeV
+# Z and H kept stable; decays handled by Pythia8 during showering.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+alias q      = b
+alias qbar   = B
+
+# Masses and widths
+me     = 0d0
+mmu    = 0d0
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+# CoM energy and seed
+sqrts = 10 TeV
+seed = 1234 # randomize for production runs
+
+# s-channel production: mu+mu- -> ZH (full diagrams, no extra neutrinos)
+process zhprod = "e2", "E2" => "Z", "H"
+process zqq = "Z" => q, qbar
+process hqq = "H" => q, qbar
+
+# Compile matrix elements
+compile
+
+# Define cuts
+cuts = all abs (Eta) < 2.3 [Z, H]
+
+# Parton shower and hadronization via Pythia8
+?ps_fsr_active = true
+?hadronization_active = true
+?allow_shower = true
+$shower_method = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+# Force hadronic decays in PYTHIA8: H -> bb, Z -> hadrons
+#$ps_PYTHIA8_config = "25:onMode = off; 25:onIfAny = 5 -5; 23:onMode = off; 23:onIfAny = 1 2 3 4 5"
+
+# Integrate production 
+integrate (zqq)
+integrate (hqq)
+# Specify Z and H decays
+unstable "Z" (zqq)
+unstable "H" (hqq)
+integrate (zhprod){ iterations = 20:8000000:"gw", 5:20000000 }
+show(results)
+
+# Generate events
+simulate (zhprod) {
+  n_events = 1000
+  sample_max_tries = 100000
+  $sample = "mumu_ZHbbbb_10TeV"
+  sample_format = hepmc
+}
