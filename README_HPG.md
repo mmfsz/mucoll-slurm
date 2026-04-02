@@ -23,6 +23,20 @@ This will:
 1. Pull the `mucoll-sim-ubuntu24:main` container image as a local `.sif` file
 2. Clone `mucoll-benchmarks` and check out the `k4MuC` branch
 
+#### Build the Pythia8 generator (one-time)
+
+The Pythia8-based ZH generator (`MuMuToZH`) must be compiled once inside the container. The binary is saved to `pythia/` and persists across sessions — you only need to rebuild if the container image is updated.
+
+```bash
+# Still on the compute node from the install step above:
+source scripts/shell_hpg.sh
+
+# Inside the container:
+source scripts/setup.sh
+bash pythia/build.sh
+exit
+```
+
 After setup, the directory structure should look like:
 
 ```

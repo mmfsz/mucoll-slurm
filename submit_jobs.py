@@ -13,7 +13,7 @@ parser.add_argument("-o", "--output", default="output/batch",
 args = parser.parse_args()
 
 # --- Configuration ---
-NUM_JOBS = 100            # Number of jobs per process
+NUM_JOBS = 50             # Number of jobs per process
 NEVENTS_PER_JOB = 10      # Events per job
 OUTPUT_BASE_DIR = os.path.join(MUONCOLLIDER_DIR, args.output)
 MUCOLL_BENCHMARKS_PATH = os.path.join(MUONCOLLIDER_DIR, "mucoll-benchmarks")
@@ -31,6 +31,7 @@ PROCESSES = [
     # ("MuMu_ZZZ_Hadronic", os.path.join(SLURM_DIR, "chains/run_chain_ZZZ_hadronic.sh")),
     # ("pgun", os.path.join(SLURM_DIR, "chains/run_chain_pgun.sh")),
     ("ZH", os.path.join(SLURM_DIR, "run_chain_ZH.sh")),
+    ("pythia_ZH", os.path.join(SLURM_DIR, "chains/run_chain_pythia_ZH.sh")),
 ]
 
 # --- Validation ---
