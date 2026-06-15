@@ -132,7 +132,7 @@ If you made it through these commands, you should have some output to analyse! T
 
 ## Batch scripts
 
-There are scripts to submit jobs at production scale in `mucoll-slurm/`. Please handle these with care, and don't try running them until you've successfully tested the workflow above. Instructions for how to use those scripts are found in the `README_BATCH.md` file.
+There are scripts to submit jobs at production scale in `mucoll-slurm/`. Please handle these with care, and don't try running them until you've successfully tested the workflow above. The batch framework (manifest + `submit.py` + `run_chain.sh`) is documented in `README_HPG.md`. (The old OSCAR-era batch docs are kept in `archive/README_BATCH.md`.)
 
 
 ## Instructions for generating BIB events from FLUKA inputs

@@ -1,93 +1,99 @@
 #!/bin/bash
 set -e
 
-# Arguments
+# Usage:
+#   run_chain_vbfZ.sh <JOB_ID> <NEVENTS> <OUTPUT_DIR> <MUCOLL_BENCHMARKS_PATH> <SET> [GRIDPACK_DIR]
+#
+# SET selects the steering variant:
+#   1 -> mumu_vbfZ_10TeV.sin              (stable Z, Pythia8 default decays)
+#   2 -> mumu_vbfZ_qq_10TeV.sin           (Whizard decays Z -> q qbar)
+#   3 -> mumu_vbfZ_hybrid_10TeV.sin       (stable Z in Whizard, Pythia8 forces Z -> hadrons)
+#   4 -> mumu_vbfZqq_inclusive_10TeV.sin  (2->4 inclusive ME, no Z resonance)
+
 JOB_ID=$1
 NEVENTS=$2
 OUTPUT_DIR=$3
 MUCOLL_BENCHMARKS_PATH=$4
+SET=${5:-3}
+GRIDPACK_DIR=${6:-""}
 
-echo "Starting job $JOB_ID with $NEVENTS events"
+case "$SET" in
+  1) SIN=mumu_vbfZ_10TeV.sin;             SAMPLE=mumu_vbfZ_10TeV;             TAG=set1 ;;
+  2) SIN=mumu_vbfZ_qq_10TeV.sin;          SAMPLE=mumu_vbfZ_qq_10TeV;          TAG=set2 ;;
+  3) SIN=mumu_vbfZ_hybrid_10TeV.sin;      SAMPLE=mumu_vbfZ_hybrid_10TeV;      TAG=set3 ;;
+  4) SIN=mumu_vbfZqq_inclusive_10TeV.sin; SAMPLE=mumu_vbfZqq_inclusive_10TeV; TAG=inclusive ;;
+  *) echo "Unknown SET=$SET (use 1, 2, 3, or 4)"; exit 1 ;;
+esac
+
+echo "Starting job $JOB_ID with $NEVENTS events (vbfZ, SET=$SET -> $SIN)"
 echo "Output directory: $OUTPUT_DIR"
 echo "Benchmarks path: $MUCOLL_BENCHMARKS_PATH"
+if [ -n "$GRIDPACK_DIR" ]; then
+    echo "Using Whizard gridpack from: $GRIDPACK_DIR"
+else
+    echo "No gridpack provided: running full phase-space integration"
+fi
 
-# Source the main environment setup
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$SCRIPT_DIR/scripts/setup.sh"
+source /opt/spack/opt/spack/__spack_path_placeholder__/__spack_path_placeholder__/__spack_path_placeholder__/__spack_path_placeholder__/linux-x86_64/mucoll-stack-2026-01-29-gox6efzvyhus5szcxoq3wscjpt5uxvl7/setup.sh
 
-# Setup detector geometry and PYTHONPATH for digi/reco steering files.
 source $MUCOLL_BENCHMARKS_PATH/k4MuCPlayground/setup_digireco.sh $MUCOLL_BENCHMARKS_PATH MAIA_v0
 
-# Create a temporary working directory
 WORKDIR=/tmp/mucoll_job_${JOB_ID}_${RANDOM}
 mkdir -p $WORKDIR
 cd $WORKDIR
 echo "Working in $WORKDIR"
 
-# Whizard needs its libraries on LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/opt/spack/opt/spack/__spack_path_placeholder__/__spack_path_placeholder__/__spack_path_placeholder__/__spack_path_placeholder__/linux-x86_64/whizard-3.1.5-2wpmahrsf5vaircj7tmf5hdo5fwz2hhw/lib:$LD_LIBRARY_PATH
 
-# Copy PandoraSettings needed for reconstruction
 cp -r $MUCOLL_BENCHMARKS_PATH/reconstruction/PandoraSettings/ ./
 
 # --- 1. Generation (Whizard) ---
-T_START=$SECONDS
 echo "Running Generation..."
-SAMPLE_NAME="mumu_ZHbbbb_10TeV"
-
-# Copy the steering file and update the number of events
-cp $MUCOLL_BENCHMARKS_PATH/generation/signal/whizard/${SAMPLE_NAME}.sin ./job.sin
-
-# Update seed and n_events
-sed -i "s/seed = .*/seed = $((1234 + JOB_ID))/" job.sin
+cp $MUCOLL_BENCHMARKS_PATH/generation/signal/whizard/$SIN ./job.sin
+sed -i "s/seed *=.*/seed = $((1234 + JOB_ID))/" job.sin
 sed -i "s/n_events = .*/n_events = $NEVENTS/" job.sin
+
+if [ -n "$GRIDPACK_DIR" ]; then
+    mkdir -p ./grids
+    cp "$GRIDPACK_DIR"/* ./grids/
+    sed -i "/^integrate (vbfz)/i ?rebuild_grids = false\n\$integrate_workspace = \"grids\"" job.sin
+fi
 
 whizard job.sin
 
-mv ${SAMPLE_NAME}.hepmc gen_output.hepmc
-T_GEN=$((SECONDS - T_START))
-echo "Generation took ${T_GEN}s"
+mv ${SAMPLE}.hepmc gen_output.hepmc
 
 # --- 2. Simulation ---
-T_START=$SECONDS
 echo "Running Simulation..."
 ddsim --steeringFile $MUCOLL_BENCHMARKS_PATH/simulation/steer_baseline.py \
     --numberOfEvents $NEVENTS \
     --inputFiles gen_output.hepmc \
     --outputFile sim_output.edm4hep.root
-T_SIM=$((SECONDS - T_START))
-echo "Simulation took ${T_SIM}s"
 
 # --- 3. Digitization ---
-T_START=$SECONDS
 echo "Running Digitization..."
 k4run $MUCOLL_BENCHMARKS_PATH/digitization/digi_steer.py \
     --IOSvc.Input sim_output.edm4hep.root \
     --IOSvc.Output digi_output.edm4hep.root
-T_DIGI=$((SECONDS - T_START))
-echo "Digitization took ${T_DIGI}s"
 
 # --- 4. Reconstruction ---
-T_START=$SECONDS
 echo "Running Reconstruction..."
 k4run $MUCOLL_BENCHMARKS_PATH/reconstruction/reco_steer.py \
     --IOSvc.Input digi_output.edm4hep.root \
     --IOSvc.Output reco_output.edm4hep.root
-T_RECO=$((SECONDS - T_START))
-echo "Reconstruction took ${T_RECO}s"
 
-# --- Move Outputs ---
-FINAL_OUT_DIR=$OUTPUT_DIR/job_${JOB_ID}_ZH
+FINAL_OUT_DIR=$OUTPUT_DIR/job_${JOB_ID}_vbfZ_${TAG}
 mkdir -p $FINAL_OUT_DIR
 echo "Moving files to $FINAL_OUT_DIR"
+ls -lh
 
 mv gen_output.hepmc $FINAL_OUT_DIR/gen_output_${JOB_ID}.hepmc
 mv sim_output.edm4hep.root $FINAL_OUT_DIR/sim_output_${JOB_ID}.edm4hep.root
 mv digi_output.edm4hep.root $FINAL_OUT_DIR/digi_output_${JOB_ID}.edm4hep.root
 mv reco_output.edm4hep.root $FINAL_OUT_DIR/reco_output_${JOB_ID}.edm4hep.root
 
-# Cleanup
+ls -lh $FINAL_OUT_DIR
+
 cd ..
 rm -rf $WORKDIR
 echo "Job $JOB_ID finished successfully"
-echo "Timing summary: Generation=${T_GEN}s, Simulation=${T_SIM}s, Digitization=${T_DIGI}s, Reconstruction=${T_RECO}s, Total=${SECONDS}s"

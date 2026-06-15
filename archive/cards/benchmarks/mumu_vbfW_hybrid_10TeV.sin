@@ -1,0 +1,58 @@
+# mumu_vbfW_hybrid_10TeV  (Set 3: stable W in Whizard, Pythia8 decays)
+########################################################################
+# Single highly-boosted W via VBF at 10 TeV (both charges summed).
+# W passed to Pythia8 as undecayed resonance; Pythia8 performs decay.
+# Here we force W -> hadrons (u/d/s/c/b quark final states).
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+# Tag-system aliases
+alias lTag  = e2:E2
+alias nuTag = n2:N2
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfw = "e2", "E2" => ("e2", "N2", "W+") + ("E2", "n2", "W-")
+
+compile
+
+cuts = all M  > 150 GeV [lTag, nuTag] and
+       all Pt > 5   GeV [lTag, nuTag] and
+       all Pt > 500 GeV ["W+", "W-"]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+# Pythia8: decay W+/W- as resonances; restrict to hadronic channels
+$ps_PYTHIA8_config = "24:mayDecay = on; 24:onMode = off; 24:onIfAny = 1 2 3 4 5"
+
+integrate (vbfw) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfw) {
+  n_events = 1000
+  sample_max_tries = 100000
+  $sample = "mumu_vbfW_hybrid_10TeV"
+  sample_format = hepmc
+}

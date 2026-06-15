@@ -1,0 +1,58 @@
+# mumu_vbfZ_hybrid_10TeV  (Set 3: stable Z in Whizard, Pythia8 decays)
+########################################################################
+# mu+ mu- -> nu_mu nu_mu_bar Z  at 10 TeV  (WW fusion)
+#
+# Z is handed to Pythia8 as an undecayed resonance; Pythia8 performs
+# the decay. Here we force Z -> hadrons (u,d,s,c,b only; no leptons,
+# no neutrinos). Remove the $ps_PYTHIA8_config line for full inclusive
+# decay.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfz = "e2", "E2" => "n2", "N2", "Z"
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all Pt > 500 GeV [Z] and
+       all abs (Eta) < 2.3 [Z]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+# Pythia8: let Z decay as a resonance; restrict to hadronic channels
+$ps_PYTHIA8_config = "23:mayDecay = on; 23:onMode = off; 23:onIfAny = 1 2 3 4 5"
+
+integrate (vbfz) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfz) {
+  n_events = 1000
+  sample_max_tries = 100000
+  $sample = "mumu_vbfZ_hybrid_10TeV"
+  sample_format = hepmc
+}

@@ -13,49 +13,99 @@ to that directory using:
   $integrate_workspace = "grids"  (relative — Whizard forbids absolute paths here)
 """
 
+import argparse
 import os
+import re
 import subprocess
 import sys
 
+import provlog
+
 # --- Configuration ---
-WORK_DIR              = "/users/mleblan6/work/bib"
+SLURM_DIR             = os.path.dirname(os.path.abspath(__file__))
+WORK_DIR              = os.path.dirname(SLURM_DIR)
 MUCOLL_BENCHMARKS_PATH = os.path.join(WORK_DIR, "mucoll-benchmarks")
-GRIDPACK_DIR          = "/oscar/data/mleblan6/mucoll/gridpacks"
-APPTAINER_IMAGE       = "/oscar/data/mleblan6/mucoll/mucoll-sim-ubuntu24:main.sif"
-DATA_DIR_TO_BIND      = "/oscar/data/mleblan6/mucoll"
+GRIDPACK_DIR          = os.path.join(WORK_DIR, "output/gridpacks")
+APPTAINER_IMAGE       = os.path.join(SLURM_DIR, "mucoll-sim.sif")
+DATA_DIR_TO_BIND      = WORK_DIR
 LOG_DIR               = os.path.join(GRIDPACK_DIR, "logs")
 
-SPACK_SETUP = (
-    "source /opt/spack/opt/spack/__spack_path_placeholder__/__spack_path_placeholder__"
-    "/__spack_path_placeholder__/__spack_path_placeholder__"
-    "/linux-x86_64/mucoll-stack-2026-01-29-gox6efzvyhus5szcxoq3wscjpt5uxvl7/setup.sh"
-)
-WHIZARD_LIB = (
-    "/opt/spack/opt/spack/__spack_path_placeholder__/__spack_path_placeholder__"
-    "/__spack_path_placeholder__/__spack_path_placeholder__"
-    "/linux-x86_64/whizard-3.1.5-2wpmahrsf5vaircj7tmf5hdo5fwz2hhw/lib"
-)
+# Software environment is centralized in lib/env.sh (one place for spack +
+# Whizard paths), sourced by the generated job script.
+ENV_SETUP = f"source {os.path.join(SLURM_DIR, 'lib', 'env.sh')}"
 
+GRID_CARDS = os.path.join(SLURM_DIR, "cards", "gridpack")
+
+# name -> (gridpack card, grid output dir). Grid dir names are kept stable so
+# pre-computed grids stay valid; card names follow the harmonized convention.
 PROCESSES = {
-    "WWZ": {
-        "sin_template": os.path.join(
-            MUCOLL_BENCHMARKS_PATH,
-            "generation/signal/whizard/mumu_WWZ_hadrons_10TeV_gridpack.sin"
-        ),
-        "workdir":  os.path.join(GRIDPACK_DIR, "grid_mumu_WWZ_hadrons"),
+    "nunuqq": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_nunuqq_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_nunuqq_10TeV"),
     },
-    "ZZZ": {
-        "sin_template": os.path.join(
-            MUCOLL_BENCHMARKS_PATH,
-            "generation/signal/whizard/mumu_ZZZ_hadrons_10TeV_gridpack.sin"
-        ),
-        "workdir":  os.path.join(GRIDPACK_DIR, "grid_mumu_ZZZ_hadrons"),
+    "mumuqq": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_mumuqq_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_mumuqq_10TeV"),
+    },
+    "bbbb": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_bbbb_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_bbbb_10TeV"),
+    },
+    # s-channel ZH (e2 E2 -> Z H). whizard = Whizard-decayed (unstable);
+    # lhe = stable production for the LHE route.
+    "ZH_bbbb_whizard": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_ZH_bbbb_whizard_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_ZH_bbbb_whizard_10TeV"),
+    },
+    "ZH_bbbb_lhe": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_ZH_bbbb_lhe_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_ZH_bbbb_lhe_10TeV"),
+    },
+    # VBF single-boson (one gridpack per boson; shared by all decayer variants).
+    "vbfH": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfH_pt500_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfH_pt500_10TeV"),
+    },
+    "vbfZ": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfZ_pt500_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfZ_pt500_10TeV"),
+    },
+    "vbfW": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfW_pt500_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfW_pt500_10TeV"),
+    },
+    # Inclusive 2->4 processes (no resonance in ME).
+    "nunuqq_Zmass_pt250": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_nunuqq_Zmass_pt250_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_nunuqq_Zmass_pt250_10TeV"),
+    },
+    "nunubb_Hmass_pt250": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_nunubb_Hmass_pt250_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_nunubb_Hmass_pt250_10TeV"),
+    },
+    "lnuqq_Wmass_pt250": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_lnuqq_Wmass_pt250_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_lnuqq_Wmass_pt250_10TeV"),
     },
 }
 
+parser = argparse.ArgumentParser(description="Submit Whizard gridpack integration jobs")
+parser.add_argument("processes", nargs="*", default=list(PROCESSES.keys()),
+                    help=f"Processes to submit (default: all). Choices: {list(PROCESSES.keys())}")
+args = parser.parse_args()
+
+# Validate process names
+for p in args.processes:
+    if p not in PROCESSES:
+        print(f"Error: unknown process '{p}'. Choose from {list(PROCESSES.keys())}")
+        sys.exit(1)
+
 os.makedirs(LOG_DIR, exist_ok=True)
 
-for name, cfg in PROCESSES.items():
+submitted = []   # (name, jobid, workdir) for the provenance log
+
+for name in args.processes:
+    cfg = PROCESSES[name]
     os.makedirs(cfg["workdir"], exist_ok=True)
 
     slurm_script = f"""#!/bin/bash
@@ -67,16 +117,16 @@ for name, cfg in PROCESSES.items():
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
+#SBATCH --qos=avery-b
 
 echo "========================================"
 echo "Whizard gridpack: {name}"
 echo "Host: $(hostname)"
 echo "========================================"
 
-apptainer exec --bind {DATA_DIR_TO_BIND},{WORK_DIR} {APPTAINER_IMAGE} bash -c '
+apptainer exec --cleanenv --bind {DATA_DIR_TO_BIND} {APPTAINER_IMAGE} bash -c '
     set -e
-    {SPACK_SETUP}
-    export LD_LIBRARY_PATH={WHIZARD_LIB}:$LD_LIBRARY_PATH
+    {ENV_SETUP}
     export OMP_NUM_THREADS=32
 
     WORKDIR={cfg["workdir"]}
@@ -103,11 +153,20 @@ apptainer exec --bind {DATA_DIR_TO_BIND},{WORK_DIR} {APPTAINER_IMAGE} bash -c '
             ["sbatch", script_path], capture_output=True, text=True, check=True
         )
         print(f"Submitted {name} gridpack job: {result.stdout.strip()}")
+        m = re.search(r"(\d+)", result.stdout)
+        submitted.append((name, m.group(1) if m else "?", cfg["workdir"]))
     except subprocess.CalledProcessError as e:
         print(f"Error submitting {name}: {e.stderr}")
     finally:
         os.remove(script_path)
 
-print(f"\nGrid files will be written to: {GRIDPACK_DIR}/grid_mumu_<PROCESS>_hadrons/grids/")
-print("Once complete, pass the gridpack dir to run_chain_*_hadronic.sh as argument 5.")
-print("  e.g.:  bash run_chain_WWZ_hadronic.sh 0 100 /output/dir /benchmarks/path /oscar/data/mleblan6/mucoll/gridpacks")
+# Provenance log.
+if submitted:
+    lines = ["gridpacks:"]
+    for name, jid, wd in submitted:
+        lines.append(f"  - `{name}`: jobid {jid} → `{os.path.relpath(wd, WORK_DIR)}/`")
+    sha, dirty = provlog.append("make_gridpack.py", lines)
+    print(f"\nLogged to PRODUCTION_LOG.md (commit {sha[:12]}"
+          f"{', DIRTY tree!' if dirty else ''}).")
+
+print(f"\nGrid files will be written to: {GRIDPACK_DIR}/<gridpack name>/  (matches the samples.conf gridpack column)")

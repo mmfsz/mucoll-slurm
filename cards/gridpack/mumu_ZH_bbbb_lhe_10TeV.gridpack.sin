@@ -1,0 +1,30 @@
+# mumu_ZH_bbbb_lhe_10TeV  —  Gridpack (phase-space integration only)
+########################################################################
+# s-channel mu+mu- -> Z H at 10 TeV, Z/H left stable (LHE route).
+# Integration only: writes the VAMP grid (.vg) for zhprod. The production card
+# reuses it with ?rebuild_grids = false. Iteration parameters match production.
+########################################################################
+
+model = SM
+
+me     = 0d0
+mmu    = 0d0
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+process zhprod = "e2", "E2" => "Z", "H"
+
+compile
+
+cuts = all abs (Eta) < 2.3 [Z, H]
+
+integrate (zhprod) { iterations = 5:50000:"gw", 10:100000 }

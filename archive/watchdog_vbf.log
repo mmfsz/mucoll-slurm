@@ -1,0 +1,79 @@
+[2026-05-25 15:43:19] Building initial state from SLURM (this may take a moment)...
+[2026-05-25 15:43:19]   found SLURM IDs for 1500 / 1500 jobs
+[2026-05-25 15:43:19] State saved to /blue/avery/m.mazza/projects/muoncollider/output/vbf_inclusive_production_10k/watchdog_state.json
+[2026-05-25 15:43:19] Watchdog started | jobs=1500 | poll=600s | max_resubmit=3 | blacklist=empty
+[2026-05-25 15:43:24]   blacklisting node(s): ['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 15:43:24]   resubmitted vbfH_inclusive_39 (attempt 1, prev state=FAILED exit=0:53) → job 33224133
+[2026-05-25 15:43:24]   resubmitted vbfH_inclusive_40 (attempt 1, prev state=FAILED exit=0:53) → job 33224134
+[2026-05-25 15:43:24]   resubmitted vbfH_inclusive_65 (attempt 1, prev state=FAILED exit=0:53) → job 33224135
+[2026-05-25 15:43:24]   resubmitted vbfH_inclusive_66 (attempt 1, prev state=FAILED exit=0:53) → job 33224136
+[2026-05-25 15:43:24]   resubmitted vbfH_inclusive_67 (attempt 1, prev state=FAILED exit=0:53) → job 33224137
+[2026-05-25 15:43:26]   resubmitted vbfH_inclusive_68 (attempt 1, prev state=FAILED exit=0:53) → job 33224146
+[2026-05-25 15:43:26]   resubmitted vbfH_inclusive_69 (attempt 1, prev state=FAILED exit=0:53) → job 33224147
+[2026-05-25 15:43:26] scan | completed=0 active=1478 resubmitted=7 exec_errors=0 over_cap=0 unknown=15 | cycles=1 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 15:53:31]   blacklisting node(s): ['c0702a-s16', 'c0706a-s13', 'c0706a-s16']
+[2026-05-25 15:53:31]   resubmitted vbfH_inclusive_133 (attempt 1, prev state=FAILED exit=0:53) → job 33224662
+[2026-05-25 15:53:31]   resubmitted vbfH_inclusive_134 (attempt 1, prev state=FAILED exit=0:53) → job 33224663
+[2026-05-25 15:53:32]   resubmitted vbfH_inclusive_135 (attempt 1, prev state=FAILED exit=0:53) → job 33224664
+[2026-05-25 15:53:32]   resubmitted vbfH_inclusive_147 (attempt 1, prev state=FAILED exit=0:53) → job 33224665
+[2026-05-25 15:53:32]   resubmitted vbfH_inclusive_222 (attempt 1, prev state=FAILED exit=0:53) → job 33224666
+[2026-05-25 15:53:32]   resubmitted vbfH_inclusive_223 (attempt 1, prev state=FAILED exit=0:53) → job 33224667
+[2026-05-25 15:53:32]   resubmitted vbfH_inclusive_224 (attempt 1, prev state=FAILED exit=0:53) → job 33224668
+[2026-05-25 15:53:32]   resubmitted vbfH_inclusive_252 (attempt 1, prev state=FAILED exit=0:53) → job 33224669
+[2026-05-25 15:53:32]   resubmitted vbfH_inclusive_253 (attempt 1, prev state=FAILED exit=0:53) → job 33224670
+[2026-05-25 15:53:32]   resubmitted vbfH_inclusive_254 (attempt 1, prev state=FAILED exit=0:53) → job 33224671
+[2026-05-25 15:53:33]   resubmitted vbfH_inclusive_273 (attempt 1, prev state=FAILED exit=0:53) → job 33224672
+[2026-05-25 15:53:33]   resubmitted vbfH_inclusive_286 (attempt 1, prev state=FAILED exit=0:53) → job 33224673
+[2026-05-25 15:53:33]   resubmitted vbfH_inclusive_290 (attempt 1, prev state=FAILED exit=0:53) → job 33224674
+[2026-05-25 15:53:33]   resubmitted vbfH_inclusive_319 (attempt 1, prev state=FAILED exit=0:53) → job 33224675
+[2026-05-25 15:53:33]   resubmitted vbfH_inclusive_320 (attempt 1, prev state=FAILED exit=0:53) → job 33224676
+[2026-05-25 15:53:33]   resubmitted vbfH_inclusive_321 (attempt 1, prev state=FAILED exit=0:53) → job 33224677
+[2026-05-25 15:53:33]   resubmitted vbfH_inclusive_322 (attempt 1, prev state=FAILED exit=0:53) → job 33224678
+[2026-05-25 15:53:34]   resubmitted vbfH_inclusive_323 (attempt 1, prev state=FAILED exit=0:53) → job 33224679
+[2026-05-25 15:53:34]   resubmitted vbfH_inclusive_384 (attempt 1, prev state=FAILED exit=0:53) → job 33224680
+[2026-05-25 15:53:34]   resubmitted vbfH_inclusive_385 (attempt 1, prev state=FAILED exit=0:53) → job 33224681
+[2026-05-25 15:53:34]   resubmitted vbfH_inclusive_440 (attempt 1, prev state=FAILED exit=0:53) → job 33224682
+[2026-05-25 15:53:34] scan | completed=12 active=1452 resubmitted=21 exec_errors=0 over_cap=0 unknown=15 | cycles=2 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 16:03:39]   blacklisting node(s): ['c0702a-s16', 'c0706a-s16']
+[2026-05-25 16:03:39]   resubmitted vbfH_inclusive_477 (attempt 1, prev state=FAILED exit=0:53) → job 33225473
+[2026-05-25 16:03:40]   resubmitted vbfW_inclusive_1 (attempt 1, prev state=FAILED exit=0:53) → job 33225474
+[2026-05-25 16:03:40]   resubmitted vbfW_inclusive_89 (attempt 1, prev state=FAILED exit=0:53) → job 33225475
+[2026-05-25 16:03:40]   resubmitted vbfW_inclusive_109 (attempt 1, prev state=FAILED exit=0:53) → job 33225476
+[2026-05-25 16:03:40]   resubmitted vbfW_inclusive_110 (attempt 1, prev state=FAILED exit=0:53) → job 33225477
+[2026-05-25 16:03:40]   resubmitted vbfW_inclusive_111 (attempt 1, prev state=FAILED exit=0:53) → job 33225479
+[2026-05-25 16:03:40]   resubmitted vbfW_inclusive_136 (attempt 1, prev state=FAILED exit=0:53) → job 33225480
+[2026-05-25 16:03:40]   resubmitted vbfW_inclusive_137 (attempt 1, prev state=FAILED exit=0:53) → job 33225481
+[2026-05-25 16:03:41]   resubmitted vbfW_inclusive_138 (attempt 1, prev state=FAILED exit=0:53) → job 33225482
+[2026-05-25 16:03:41]   resubmitted vbfW_inclusive_139 (attempt 1, prev state=FAILED exit=0:53) → job 33225483
+[2026-05-25 16:03:41]   resubmitted vbfW_inclusive_140 (attempt 1, prev state=FAILED exit=0:53) → job 33225484
+[2026-05-25 16:03:41]   resubmitted vbfW_inclusive_141 (attempt 1, prev state=FAILED exit=0:53) → job 33225485
+[2026-05-25 16:03:41]   resubmitted vbfW_inclusive_142 (attempt 1, prev state=FAILED exit=0:53) → job 33225486
+[2026-05-25 16:03:41]   resubmitted vbfW_inclusive_143 (attempt 1, prev state=FAILED exit=0:53) → job 33225487
+[2026-05-25 16:03:41]   resubmitted vbfW_inclusive_165 (attempt 1, prev state=FAILED exit=0:53) → job 33225488
+[2026-05-25 16:03:41] scan | completed=283 active=1187 resubmitted=15 exec_errors=0 over_cap=0 unknown=15 | cycles=3 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 16:13:47]   blacklisting node(s): ['c0702a-s16', 'c0706a-s16']
+[2026-05-25 16:13:47]   resubmitted vbfZ_inclusive_77 (attempt 1, prev state=FAILED exit=0:53) → job 33226547
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_199 (attempt 1, prev state=FAILED exit=0:53) → job 33226548
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_200 (attempt 1, prev state=FAILED exit=0:53) → job 33226549
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_201 (attempt 1, prev state=FAILED exit=0:53) → job 33226550
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_202 (attempt 1, prev state=FAILED exit=0:53) → job 33226551
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_203 (attempt 1, prev state=FAILED exit=0:53) → job 33226552
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_204 (attempt 1, prev state=FAILED exit=0:53) → job 33226553
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_205 (attempt 1, prev state=FAILED exit=0:53) → job 33226554
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_206 (attempt 1, prev state=FAILED exit=0:53) → job 33226555
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_239 (attempt 1, prev state=FAILED exit=0:53) → job 33226556
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_448 (attempt 1, prev state=FAILED exit=0:53) → job 33226557
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_449 (attempt 1, prev state=FAILED exit=0:53) → job 33226558
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_450 (attempt 1, prev state=FAILED exit=0:53) → job 33226559
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_451 (attempt 1, prev state=FAILED exit=0:53) → job 33226560
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_452 (attempt 1, prev state=FAILED exit=0:53) → job 33226561
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_453 (attempt 1, prev state=FAILED exit=0:53) → job 33226562
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_454 (attempt 1, prev state=FAILED exit=0:53) → job 33226563
+[2026-05-25 16:13:47]   resubmitted vbfW_inclusive_455 (attempt 1, prev state=FAILED exit=0:53) → job 33226564
+[2026-05-25 16:13:47] scan | completed=643 active=824 resubmitted=18 exec_errors=0 over_cap=0 unknown=15 | cycles=4 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 16:23:52] scan | completed=935 active=550 resubmitted=0 exec_errors=0 over_cap=0 unknown=15 | cycles=4 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 16:33:58] scan | completed=976 active=509 resubmitted=0 exec_errors=0 over_cap=0 unknown=15 | cycles=4 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 16:44:03] scan | completed=1187 active=298 resubmitted=0 exec_errors=0 over_cap=0 unknown=15 | cycles=4 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 16:54:08] scan | completed=1430 active=55 resubmitted=0 exec_errors=0 over_cap=0 unknown=15 | cycles=4 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 17:04:13] scan | completed=1485 active=0 resubmitted=0 exec_errors=0 over_cap=0 unknown=15 | cycles=4 blacklist=['c0702a-s16', 'c0706a-s13', 'c0706a-s16', 'c0706a-s9']
+[2026-05-25 17:04:13] All jobs settled. completed=1485 exec_errors=0 over_cap=0. Watchdog exiting.

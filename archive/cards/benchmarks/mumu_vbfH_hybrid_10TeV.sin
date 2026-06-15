@@ -1,0 +1,59 @@
+# mumu_vbfH_hybrid_10TeV  (Set 3: stable H in Whizard, Pythia8 decays)
+########################################################################
+# mu+ mu- -> nu_mu nu_mu_bar H  at 10 TeV  (WW fusion)
+#
+# H is passed to Pythia8 as an undecayed resonance (not declared unstable
+# in Whizard). Pythia8 decays it via its own resonance-decay module,
+# preserving clean per-boson colour/ancestry information in HepMC.
+#
+# Here we force H -> b bbar for a boosted-Hbb sample. Remove the
+# $ps_PYTHIA8_config line to let Pythia use SM branching ratios.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfh = "e2", "E2" => "n2", "N2", "H"
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all Pt > 500 GeV [H]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+# Make sure Pythia8 decays the H and force H -> b bbar
+$ps_PYTHIA8_config = "25:mayDecay = on; 25:onMode = off; 25:onIfMatch = 5 -5"
+
+integrate (vbfh) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfh) {
+  n_events = 1000
+  sample_max_tries = 100000
+  $sample = "mumu_vbfH_hybrid_10TeV"
+  sample_format = hepmc
+}

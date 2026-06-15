@@ -1,0 +1,75 @@
+# TEST C: include leptonic Z decay channels so computed total width is
+# closer to the preset wZ = 2.478 GeV.
+# Hypothesis: residual-width re-routing. If adding leptonic channels lets
+# the sampler respect the BRs of hadronic channels, the 100% bb bias was
+# caused by the 0.784 GeV residual between computed (1.694) and preset
+# (2.478) total widths being re-routed to the last-listed channel.
+#
+# Skipping z_numu (Z -> nu_mu nu_mu_bar) because the VBF cut
+# `M > 150 GeV [n2, N2]` applies globally and would reject all Z -> n2 N2
+# decay events (M(nn) = mZ = 91 GeV < 150 GeV). Computed total will land
+# at ~2.28 GeV instead of 2.478 GeV — residual ~0.2 GeV, vs 0.78 GeV in
+# Set 2. Directionally enough to test H1.
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+alias q_light = u:d:s
+alias Q_light = U:D:S
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfz     = "e2", "E2" => "n2", "N2", "Z"
+process z_uds    = "Z" => q_light, Q_light
+process z_cc     = "Z" => c, C
+process z_bb     = "Z" => b, B
+process z_ee     = "Z" => e1, E1
+process z_mumu   = "Z" => e2, E2
+process z_tautau = "Z" => e3, E3
+process z_nuee   = "Z" => n1, N1
+process z_nutata = "Z" => n3, N3
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all Pt > 500 GeV [Z] and
+       all abs (Eta) < 2.3 [Z]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+integrate (z_uds)
+integrate (z_cc)
+integrate (z_bb)
+integrate (z_ee)
+integrate (z_mumu)
+integrate (z_tautau)
+integrate (z_nuee)
+integrate (z_nutata)
+unstable "Z" (z_uds, z_cc, z_bb, z_ee, z_mumu, z_tautau, z_nuee, z_nutata)
+integrate (vbfz) { iterations = 5:50000:"gw", 10:100000 }
+
+simulate (vbfz) {
+  n_events = 100
+  sample_max_tries = 100000
+  $sample = "mumu_vbfZ_testC_leptonic_10TeV"
+  sample_format = hepmc
+}

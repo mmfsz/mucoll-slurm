@@ -1,0 +1,50 @@
+# mumu_vbfZqq_inclusive_10TeV — Gridpack (phase-space integration only)
+########################################################################
+# Inclusive 2->4 WW-fusion Z-like at 10 TeV, no Z resonance in ME.
+# Shared by SET=4 production cards. Run once; production jobs load
+# the resulting .vg files via ?rebuild_grids = false.
+#
+# Process and cuts are identical to the production card so that the
+# phase-space sampling is optimal for the actual event generation.
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+alias q_light = u:d:s
+alias Q_light = U:D:S
+alias any_q   = u:d:s:c:b
+alias any_Q   = U:D:S:C:B
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfzqq = "e2", "E2" =>
+      ("n2", "N2", q_light, Q_light)
+    + ("n2", "N2", c, C)
+    + ("n2", "N2", b, B)
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all M  > 80  GeV [any_q, any_Q] and
+       all M  < 102 GeV [any_q, any_Q] and
+       all Pt > 250 GeV [any_q, any_Q] and
+       all abs (Eta) < 2.3 [any_q, any_Q]
+
+integrate (vbfzqq) { iterations = 5:50000:"gw", 10:100000 }

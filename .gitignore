@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.submit_*.sh
+
+# Container image (8+ GB) — pull with scripts/install_hpg.sh, don't track
+*.sif
+
+# Compiled pythia binaries — build with pythia/build.sh, don't track (keep the .cc sources)
+pythia/MuMuToZH
+pythia/LheToHepMC
+pythia/probeZdecay

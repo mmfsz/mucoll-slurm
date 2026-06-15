@@ -1,0 +1,79 @@
+# mumu_WW_schannel_10TeV
+########################################################################
+# mu+mu- -> W+W- at 10 TeV
+# W+ and W- decayed by Whizard; Pythia8 handles showering and hadronization.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+# W+ -> up-type + anti-down-type light quarks (u,d,s massless)
+alias Dbar   = D:S
+alias dquark = d:s
+
+# Masses and widths
+me     = 0d0
+mmu    = 0d0
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+# CoM energy and seed
+sqrts = 10 TeV
+seed = 1234 # randomize for production runs
+
+# s-channel production: mu+mu- -> W+W- (includes gamma/Z s-channel + nu_mu t-channel)
+process wwprod = "e2", "E2" => "W+", "W-"
+
+# W+ hadronic decays: u Dbar (u,d,s massless) + c Dbar (c massive)
+process wp_u = "W+" => u, Dbar
+process wp_c = "W+" => c, Dbar
+
+# W- hadronic decays: dquark U (u,d,s massless) + dquark C (c massive)
+process wm_u = "W-" => dquark, U
+process wm_c = "W-" => dquark, C
+
+# Compile matrix elements
+compile
+
+# Define cuts
+cuts = all abs (Eta) < 2.3 ["W+", "W-"]
+
+# Parton shower and hadronization via Pythia8
+?ps_fsr_active = true
+?hadronization_active = true
+?allow_shower = true
+$shower_method = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+# Disable color reconnection — Whizard's `unstable` decay passes pre-decayed
+# quarks to Pythia8, losing the per-boson color flow context.
+$ps_PYTHIA8_config = "ColourReconnection:reconnect = off"
+
+# Integrate decay channels
+integrate (wp_u)
+integrate (wp_c)
+integrate (wm_u)
+integrate (wm_c)
+
+# Specify W decays
+unstable "W+" (wp_u, wp_c)
+unstable "W-" (wm_u, wm_c)
+
+# Integrate production
+integrate (wwprod){ iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+# Generate events
+simulate (wwprod) {
+  n_events = 1000
+  sample_max_tries = 100000
+  $sample = "mumu_WWqqqq_10TeV"
+  sample_format = hepmc
+}

@@ -1,0 +1,57 @@
+# TEST A: reorder unstable list -> (z_bb, z_uds, z_cc)
+# Hypothesis: if 100% of events now go to z_cc, Whizard is just picking the
+# last-listed channel regardless of BR (ordering bug).
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+alias q_light = u:d:s
+alias Q_light = U:D:S
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfz   = "e2", "E2" => "n2", "N2", "Z"
+process z_uds  = "Z" => q_light, Q_light
+process z_cc   = "Z" => c, C
+process z_bb   = "Z" => b, B
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all Pt > 500 GeV [Z] and
+       all abs (Eta) < 2.3 [Z]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+integrate (z_uds)
+integrate (z_cc)
+integrate (z_bb)
+# REORDERED: z_bb FIRST, z_cc LAST
+unstable "Z" (z_bb, z_uds, z_cc)
+integrate (vbfz) { iterations = 5:50000:"gw", 10:100000 }
+
+simulate (vbfz) {
+  n_events = 100
+  sample_max_tries = 100000
+  $sample = "mumu_vbfZ_testA_reorder_10TeV"
+  sample_format = hepmc
+}

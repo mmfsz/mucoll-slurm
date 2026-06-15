@@ -1,0 +1,39 @@
+# mumu_ZH_bbbb_whizard_10TeV  —  Gridpack (phase-space integration only)
+########################################################################
+# s-channel mu+mu- -> Z H at 10 TeV; Z->bb, H->bb decayed by Whizard (unstable).
+# Integration only: writes the VAMP grids (.vg) for the decay (zqq, hqq) and
+# production (zhprod) channels. The production card reuses them with
+# ?rebuild_grids = false. Iteration parameters match the production card exactly.
+########################################################################
+
+model = SM
+alias q      = b
+alias qbar   = B
+
+me     = 0d0
+mmu    = 0d0
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed = 1234
+
+process zhprod = "e2", "E2" => "Z", "H"
+process zqq = "Z" => q, qbar
+process hqq = "H" => q, qbar
+
+compile
+
+cuts = all abs (Eta) < 2.3 [Z, H]
+
+integrate (zqq)
+integrate (hqq)
+unstable "Z" (zqq)
+unstable "H" (hqq)
+integrate (zhprod){ iterations = 5:50000:"gw", 10:100000 }

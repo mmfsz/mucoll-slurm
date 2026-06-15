@@ -1,0 +1,76 @@
+# mumu_vbfZqq_inclusive_10TeV  —  2->4 VBF hadronic, inclusive (no Z resonance)
+########################################################################
+# mu+ mu- -> nu_mu nu_mu_bar q qbar at 10 TeV (WW fusion + all interfering
+# diagrams). No explicit Z in the ME, no unstable, no Pythia resonance
+# decay. Colour flow is handed directly from Whizard's omega ME to Pythia
+# for shower + hadronization. Designed as a workaround for the
+# multi-channel `unstable` sampling bias observed in the Set 2 cards.
+#
+# The q qbar system is on-shell-Z-like thanks to the 80 < M(jj) < 102 GeV
+# cut. Boosted regime from pT(q, qbar) > 250 GeV each.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+alias q_light = u:d:s
+alias Q_light = U:D:S
+
+# Alias used only inside cuts — lets us iterate over all hadronic flavors.
+alias any_q = u:d:s:c:b
+alias any_Q = U:D:S:C:B
+
+sqrts = 10 TeV
+seed  = 1234
+
+# Inclusive 2->4: nu_mu nu_mu_bar + q qbar (light uds + cc + bb, split to
+# keep alias masses uniform per subprocess — same pattern as WWZ card).
+process vbfzqq = "e2", "E2" =>
+      ("n2", "N2", q_light, Q_light)
+    + ("n2", "N2", c, C)
+    + ("n2", "N2", b, B)
+
+compile
+
+# Cuts:
+#   - VBF tag:       M(nu nu) > 150 GeV, pT(each nu) > 5 GeV
+#   - On-shell Z:    80 < M(jj) < 102 GeV  (± ~11 GeV around mZ)
+#   - Boosted jets:  pT(each q) > 250 GeV   (Z at pT ~500 GeV -> each b ~ mZ/2 boosted)
+#   - Acceptance:    |eta(each q)| < 2.3
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all M  > 80  GeV [any_q, any_Q] and
+       all M  < 102 GeV [any_q, any_Q] and
+       all Pt > 250 GeV [any_q, any_Q] and
+       all abs (Eta) < 2.3 [any_q, any_Q]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+integrate (vbfzqq) { iterations = 10:100000:"gw", 10:200000 }
+show(results)
+
+simulate (vbfzqq) {
+  n_events = 100
+  sample_max_tries = 100000
+  $sample = "mumu_vbfZqq_inclusive_10TeV"
+  sample_format = hepmc
+}

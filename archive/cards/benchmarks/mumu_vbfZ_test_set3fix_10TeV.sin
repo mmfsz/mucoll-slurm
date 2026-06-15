@@ -1,0 +1,46 @@
+# TEST: Set 3 fix -- replace 'onIfAny = 1 2 3 4 5' with 'onMode = 1' (all SM channels)
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfz = "e2", "E2" => "n2", "N2", "Z"
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all Pt > 500 GeV [Z]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+# Enable all Z channels (SM BRs, including bb)
+$ps_PYTHIA8_config = "23:mayDecay = on; 23:onMode = 1"
+
+integrate (vbfz) { iterations = 5:50000:"gw", 10:100000 }
+
+simulate (vbfz) {
+  n_events = 100
+  sample_max_tries = 100000
+  $sample = "mumu_vbfZ_test_set3fix_10TeV"
+  sample_format = hepmc
+}

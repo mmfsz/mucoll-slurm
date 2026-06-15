@@ -1,0 +1,65 @@
+# mumu_vbfHbb_inclusive_10TeV  —  2->4 VBF hadronic H, inclusive (no H resonance)
+########################################################################
+# mu+ mu- -> nu_mu nu_mu_bar b bbar at 10 TeV (WW fusion + all interfering
+# diagrams). No explicit H in the ME, no unstable, no Pythia resonance
+# decay. Colour flow is handed directly from Whizard's omega ME to Pythia
+# for shower + hadronization. Workaround for the multi-channel `unstable`
+# sampling bias.
+#
+# The b bbar system is on-shell-H-like thanks to the 115 < M(bb) < 135 GeV
+# cut. Boosted regime from pT(b, bbar) > 250 GeV each.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+# Inclusive 2->4: nu_mu nu_mu_bar b bbar (H->bb dominant mode)
+process vbfhbb = "e2", "E2" => "n2", "N2", b, B
+
+compile
+
+# Cuts:
+#   - VBF tag:       M(nu nu) > 150 GeV, pT(each nu) > 5 GeV
+#   - On-shell H:    115 < M(bb) < 135 GeV  (± 10 GeV around mH)
+#   - Boosted jets:  pT(each b) > 250 GeV
+#   - Acceptance:    |eta(each b)| < 2.3
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all M  > 115 GeV [b, B] and
+       all M  < 135 GeV [b, B] and
+       all Pt > 250 GeV [b, B] and
+       all abs (Eta) < 2.3 [b, B]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+integrate (vbfhbb) { iterations = 10:100000:"gw", 10:200000 }
+show(results)
+
+simulate (vbfhbb) {
+  n_events = 100
+  sample_max_tries = 100000
+  $sample = "mumu_vbfHbb_inclusive_10TeV"
+  sample_format = hepmc
+}

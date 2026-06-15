@@ -1,0 +1,74 @@
+# mumu_vbfW_qq_10TeV  (Set 2: Whizard decays W -> q qbar')
+########################################################################
+# Single highly-boosted W via VBF at 10 TeV, W -> hadrons.
+#
+# W+ -> u Dbar  (u,d,s massless; c handled separately because m_c != 0)
+# W- -> Ubar d  (charge-conjugate)
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+# W decay aliases (follow the WWqqqq card's grouping)
+alias Dbar   = D:S
+alias dquark = d:s
+
+# Tag-system aliases
+alias lTag  = e2:E2
+alias nuTag = n2:N2
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfw = "e2", "E2" => ("e2", "N2", "W+") + ("E2", "n2", "W-")
+
+# W+ hadronic: u Dbar (u,d,s massless) + c Dbar (c massive)
+process wp_u = "W+" => u, Dbar
+process wp_c = "W+" => c, Dbar
+
+# W- hadronic: dquark U + dquark C
+process wm_u = "W-" => dquark, U
+process wm_c = "W-" => dquark, C
+
+compile
+
+cuts = all M  > 150 GeV [lTag, nuTag] and
+       all Pt > 5   GeV [lTag, nuTag] and
+       all Pt > 500 GeV ["W+", "W-"]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+integrate (wp_u)
+integrate (wp_c)
+integrate (wm_u)
+integrate (wm_c)
+unstable "W+" (wp_u, wp_c)
+unstable "W-" (wm_u, wm_c)
+integrate (vbfw) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfw) {
+  n_events = 1000
+  sample_max_tries = 100000
+  $sample = "mumu_vbfW_qq_10TeV"
+  sample_format = hepmc
+}

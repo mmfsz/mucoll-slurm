@@ -1,0 +1,57 @@
+# mumu_ZHbbbb_hybrid_noCR_10TeV  (Set 3: hybrid + CR completely off)
+########################################################################
+# mu+mu- -> ZH (s-channel) at 10 TeV
+#
+# Same as mumu_ZHbbbb_hybrid_10TeV.sin but with Pythia8 colour
+# reconnection turned off (ColourReconnection:reconnect = off).
+#
+# Purpose: diagnostic test to confirm that the truth-jet-mass shoulder
+# at >140 GeV in the hybrid sample is caused by Pythia8's CR model.
+# If the bump disappears, CR is the confirmed source.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+# Masses and widths
+me     = 0d0
+mmu    = 0d0
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+# s-channel production: mu+mu- -> ZH; Z and H left stable for Pythia8
+process zhprod = "e2", "E2" => "Z", "H"
+
+compile
+
+cuts = all abs (Eta) < 2.3 [Z, H]
+
+# Parton shower and hadronization via Pythia8
+?ps_fsr_active        = true
+?hadronization_active = true
+?allow_shower         = true
+$shower_method        = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+# Pythia8: decay Z -> bb and H -> bb; colour reconnection fully disabled
+$ps_PYTHIA8_config = "23:mayDecay = on; 23:onMode = off; 23:onIfAny = 5; 25:mayDecay = on; 25:onMode = off; 25:onIfAny = 5; ColourReconnection:reconnect = off"
+
+integrate (zhprod) { iterations = 5:50000:"gw", 5:100000 }
+show(results)
+
+simulate (zhprod) {
+  n_events = 100
+  sample_max_tries = 100000
+  $sample = "mumu_ZHbbbb_hybrid_noCR_10TeV"
+  sample_format = hepmc
+}

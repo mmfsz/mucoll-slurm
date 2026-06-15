@@ -1,0 +1,57 @@
+# mumu_vbfH_bb_10TeV  (Set 2: Whizard decays H -> b bbar)
+########################################################################
+# mu+ mu- -> nu_mu nu_mu_bar H, H -> b bbar  at 10 TeV  (WW fusion)
+#
+# H declared unstable; decay performed by Whizard. Pythia8 showers and
+# hadronizes the daughter quarks. Single resonance -> no cross-boson
+# colour-reconnection problem, so CR is left on.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfh = "e2", "E2" => "n2", "N2", "H"
+process hbb  = "H" => b, B
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all Pt > 500 GeV [H] and
+       all abs (Eta) < 2.3 [H]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+integrate (hbb)
+unstable "H" (hbb)
+integrate (vbfh) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfh) {
+  n_events = 1000
+  sample_max_tries = 100000
+  $sample = "mumu_vbfH_bb_10TeV"
+  sample_format = hepmc
+}

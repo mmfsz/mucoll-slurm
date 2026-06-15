@@ -1,0 +1,41 @@
+# mumu_ZHbbbb_inclusive_10TeV - Grid Integration Only
+########################################################################
+# mu+mu- -> b bbar b bbar at 10 TeV (inclusive ME level)
+# All 2->4 diagrams included (ZH, ZZ, HH, etc.); no unstable decays.
+#
+# This card only runs the phase-space integration and writes the VAMP
+# grid files (.vg). It should be run once with many CPUs and a long
+# walltime. The resulting grids can then be loaded by downstream
+# production jobs with ?rebuild_grids = false, skipping re-integration.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+# Masses and widths
+me     = 0d0
+mmu    = 0d0
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+# CoM energy and seed
+sqrts = 10 TeV
+seed = 1234
+
+# Inclusive 2->4 production: mu+mu- -> b bbar b bbar
+# Includes all contributing diagrams (s-channel ZH, ZZ, HH, continuum)
+process bbbb = "e2", "E2" => b, B, b, B
+
+# Compile matrix elements
+compile
+
+# High-statistics integration matching the production card parameters exactly.
+integrate (bbbb) { iterations = 20:8000000:"gw", 5:20000000 }

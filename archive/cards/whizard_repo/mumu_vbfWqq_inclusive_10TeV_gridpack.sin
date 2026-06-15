@@ -1,0 +1,54 @@
+# mumu_vbfWqq_inclusive_10TeV — Gridpack (phase-space integration only)
+########################################################################
+# Inclusive 2->4 WZ/Wgamma-fusion W-like at 10 TeV, no W resonance in ME.
+# Both charges (W+: mu- nu_mu_bar + qq', W-: mu+ nu_mu + qq'bar).
+# Shared by SET=4 production cards. Run once; production jobs load
+# the resulting .vg files via ?rebuild_grids = false.
+#
+# Process and cuts are identical to the production card so that the
+# phase-space sampling is optimal for the actual event generation.
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+alias q_down  = d:s
+alias Q_down  = D:S
+alias lTag    = e2:E2
+alias nuTag   = n2:N2
+alias any_jq  = u:c:d:s
+alias any_jQ  = U:C:D:S
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfwqq = "e2", "E2" =>
+      ("e2", "N2", u, Q_down)
+    + ("e2", "N2", c, Q_down)
+    + ("E2", "n2", U, q_down)
+    + ("E2", "n2", C, q_down)
+
+compile
+
+cuts = all M  > 150 GeV [lTag, nuTag] and
+       all Pt > 5   GeV [lTag, nuTag] and
+       all M  > 70  GeV [any_jq, any_jQ] and
+       all M  < 90  GeV [any_jq, any_jQ] and
+       all Pt > 250 GeV [any_jq, any_jQ] and
+       all abs (Eta) < 2.3 [any_jq, any_jQ]
+
+integrate (vbfwqq) { iterations = 10:100000:"gw", 10:200000 }

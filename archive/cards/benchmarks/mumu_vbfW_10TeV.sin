@@ -1,0 +1,60 @@
+# mumu_vbfW_10TeV  (Set 1: stable W, Pythia8 default decays)
+########################################################################
+# Single highly-boosted W via VBF at 10 TeV (WZ / W-gamma fusion).
+# Both charges summed:
+#   mu- mu+ -> mu-  nu_mu_bar  W+
+#   mu- mu+ -> mu+  nu_mu      W-
+#
+# W is left stable in Whizard; Pythia8 decays it with default BRs.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+# Tag-system aliases (one charged lepton + one neutrino per event)
+alias lTag  = e2:E2
+alias nuTag = n2:N2
+
+sqrts = 10 TeV
+seed  = 1234
+
+# Sum of both W charges via Whizard's `+` combinator
+process vbfw = "e2", "E2" => ("e2", "N2", "W+") + ("E2", "n2", "W-")
+
+compile
+
+# VBF tag-pair cut: (l-, nu_bar) for W+ events, (l+, nu) for W- events.
+cuts = all M  > 150 GeV [lTag, nuTag] and
+       all Pt > 5   GeV [lTag, nuTag] and
+       all Pt > 500 GeV ["W+", "W-"]
+
+?ps_fsr_active       = true
+?hadronization_active = true
+?allow_shower        = true
+$shower_method       = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+integrate (vbfw) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfw) {
+  n_events = 1000
+  sample_max_tries = 100000
+  $sample = "mumu_vbfW_10TeV"
+  sample_format = hepmc
+}

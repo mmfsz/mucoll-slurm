@@ -1,0 +1,59 @@
+# mumu_ZH_10TeV
+########################################################################
+# mu+mu- -> ZH at 10 TeV via VBF (full diagrams)
+# Z and H are kept stable; decays handled by Pythia8 during showering.
+#
+# Based on mumu_H_bb_3TeV.sin
+# Author Maria Mazza
+########################################################################
+
+model = SM
+
+# Masses and widths
+me     = 0d0
+mmu    = 0d0
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+# Aliases
+alias ANU = nuebar:numubar:nutaubar
+alias NNU = nue:numu:nutau
+
+# CoM energy and seed
+sqrts = 10 TeV
+seed = 1234
+
+# Full production: mu+mu- -> ZH + neutrinos (VBF topology)
+# Z and H produced as stable particles; Pythia8 handles their decays.
+process zhprod = "e2", "E2" => "Z", "H", NNU, ANU
+
+# Compile matrix elements
+compile
+
+# Cuts: require large missing mass (selects VBF)
+cuts = all M > 150 GeV [NNU, ANU]
+
+# Parton shower and hadronization via Pythia8
+# Pythia8 will also decay Z and H
+?ps_fsr_active = true
+?hadronization_active = true
+?allow_shower = true
+$shower_method = "PYTHIA8"
+$hadronization_method = "PYTHIA8"
+
+# Integrate production
+integrate (zhprod) { iterations = 20:8000000:"gw", 5:20000000 }
+show(results)
+
+# Generate events
+simulate (zhprod) {
+  n_events = 1000
+  $sample = "mumu_ZH_10TeV"
+  sample_format = hepmc
+}
