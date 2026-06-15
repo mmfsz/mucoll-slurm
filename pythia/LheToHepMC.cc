@@ -6,7 +6,14 @@
 // Per-boson color flow is handled entirely by Pythia8, avoiding the ~38%
 // cross-ancestry bias introduced by Whizard's color assignment in the hybrid.
 //
-// Usage: LheToHepMC <lheFile> <nEvents> <jobID> <outputPath>
+// Usage: LheToHepMC <lheFile> <nEvents> <jobID> <outputPath> [decayConfig]
+//
+// The optional 5th argument <decayConfig> is a semicolon-separated list of
+// Pythia8 readString commands selecting the resonance decay channel(s), e.g.
+//   "23:mayDecay = on; 23:onMode = off; 23:onIfAny = 1 2 3 4 5"  (Z->all hadronic)
+// It is supplied per-card by gen/whizard_lhe.sh, which greps the card's
+// "# LHE_DECAY:" directive. If omitted, the code falls back to the original
+// hardcoded ZH behaviour (Z->bb, H->bb) — keeping ZH_bbbb_lhe unchanged.
 //
 // Author: Maria Mazza
 
@@ -15,6 +22,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <filesystem>
 
 using namespace Pythia8;
@@ -25,6 +33,7 @@ int main(int argc, char* argv[]) {
     int         nEvents  = 10;
     int         jobID    = 0;
     std::string outPath  = "gen_output.hepmc";
+    std::string decayConfig = "";   // optional 5th arg; empty -> ZH default below
 
     if (argc > 1) lheFile = argv[1];
     if (argc > 2) {
@@ -36,6 +45,7 @@ int main(int argc, char* argv[]) {
         catch (...) { std::cerr << "Bad jobID '" << argv[3] << "', using 0\n"; }
     }
     if (argc > 4) outPath = argv[4];
+    if (argc > 5) decayConfig = argv[5];
 
     std::cout << "LheToHepMC: lheFile=" << lheFile
               << "  nEvents=" << nEvents
@@ -59,15 +69,34 @@ int main(int argc, char* argv[]) {
     pythia.readString("Beams:frameType = 4");
     pythia.readString("Beams:LHEF = " + lheFile);
 
-    // --- Force Z -> bb ---
-    pythia.readString("23:mayDecay = on");
-    pythia.readString("23:onMode = off");
-    pythia.readString("23:onIfAny = 5");
+    // --- Resonance decay channel selection ---
+    // If a decayConfig was passed (5th arg, from the card's "# LHE_DECAY:"
+    // directive), apply it verbatim — each ';'-separated command via readString.
+    // Otherwise fall back to the original hardcoded ZH behaviour: Z->bb, H->bb.
+    if (!decayConfig.empty()) {
+        std::cout << "LheToHepMC: applying decay config: " << decayConfig << "\n";
+        std::stringstream ss(decayConfig);
+        std::string cmd;
+        while (std::getline(ss, cmd, ';')) {
+            // trim leading/trailing whitespace
+            size_t b = cmd.find_first_not_of(" \t");
+            if (b == std::string::npos) continue;       // skip empty tokens
+            size_t e = cmd.find_last_not_of(" \t");
+            cmd = cmd.substr(b, e - b + 1);
+            pythia.readString(cmd);
+        }
+    } else {
+        std::cout << "LheToHepMC: no decay config given, using ZH default (Z->bb, H->bb)\n";
+        // --- Force Z -> bb ---
+        pythia.readString("23:mayDecay = on");
+        pythia.readString("23:onMode = off");
+        pythia.readString("23:onIfAny = 5");
 
-    // --- Force H -> bb ---
-    pythia.readString("25:mayDecay = on");
-    pythia.readString("25:onMode = off");
-    pythia.readString("25:onIfAny = 5");
+        // --- Force H -> bb ---
+        pythia.readString("25:mayDecay = on");
+        pythia.readString("25:onMode = off");
+        pythia.readString("25:onIfAny = 5");
+    }
 
     // --- Enable FSR and hadronization ---
     pythia.readString("PartonLevel:FSR = on");

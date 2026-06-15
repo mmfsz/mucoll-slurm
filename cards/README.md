@@ -40,6 +40,21 @@ in Whizard, decayed by Pythia8 (channel forced via `$ps_PYTHIA8_config`);
 `pythiaNoCR`/`pythiaSKI` = pythia + a colour-reconnection variant (off / SK-I mode 3);
 `lhe` = Whizard writes parton-level LHE, `pythia/LheToHepMC` showers+decays.
 
+### LHE-route decay directive (`# LHE_DECAY:`)
+
+For `lhe` cards, Whizard does no showering, so the boson decay channel cannot be
+set via `$ps_PYTHIA8_config`. Instead the card carries a comment directive:
+
+```
+# LHE_DECAY: 23:mayDecay = on; 23:onMode = off; 23:onIfAny = 1 2 3 4 5
+```
+
+`gen/whizard_lhe.sh` greps this line and passes its value as a 5th argument to
+`pythia/LheToHepMC`, which applies each `;`-separated token via `readString`.
+**If the directive is absent**, `LheToHepMC` falls back to its hardcoded ZH
+default (Z→bb, H→bb) — so `mumu_ZH_bbbb_lhe` deliberately has no directive,
+while `mumu_vbfZ_qq_pt500_lhe` carries the Z→all-hadronic directive above.
+
 ## Cut table (every production card)
 
 | Card | process (ME) | boson/jet pT | mass window | tag / other |
@@ -55,6 +70,7 @@ in Whizard, decayed by Pythia8 (channel forced via `$ps_PYTHIA8_config`);
 | `mumu_vbfZ_incl_pt500_pythia` | `e2 E2 => νν̄ Z`, Pythia default BR | **Pt(Z)>500** | — | M(νν̄)>150, \|η(Z)\|<2.3 |
 | `mumu_vbfZ_qq_pt500_whizard` | `e2 E2 => νν̄ Z`, Whizard Z→qq (uds,c,b) | **Pt(Z)>500** | — | M(νν̄)>150, \|η(Z)\|<2.3 |
 | `mumu_vbfZ_qq_pt500_pythia` | `e2 E2 => νν̄ Z`, Pythia Z→qq | **Pt(Z)>500** | — | M(νν̄)>150, \|η(Z)\|<2.3 |
+| `mumu_vbfZ_qq_pt500_lhe` | `e2 E2 => νν̄ Z`, decay in LheToHepMC (Z→qq, all hadronic) | **Pt(Z)>500** | — | M(νν̄)>150, \|η(Z)\|<2.3 |
 | `mumu_vbfW_incl_pt500_pythia` | `e2 E2 => ℓν W`, Pythia default BR | **Pt(W)>500** | — | M(ℓν tag)>150, \|η(W)\|<2.3 |
 | `mumu_vbfW_qq_pt500_whizard` | `e2 E2 => ℓν W`, Whizard W→qq | **Pt(W)>500** | — | M(ℓν tag)>150, \|η(W)\|<2.3 |
 | `mumu_vbfW_qq_pt500_pythia` | `e2 E2 => ℓν W`, Pythia W→qq | **Pt(W)>500** | — | M(ℓν tag)>150, \|η(W)\|<2.3 |

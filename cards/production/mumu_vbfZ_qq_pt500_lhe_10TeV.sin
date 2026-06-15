@@ -1,0 +1,64 @@
+# mumu_vbfZ_qq_pt500_lhe_10TeV  (LHE route: parton-level LHE from Whizard, shower in Pythia8)
+########################################################################
+# mu+ mu- -> nu_mu nu_mu_bar Z  at 10 TeV  (WW fusion), pT(Z) > 500 GeV
+#
+# Whizard produces a parton-level LHE file (matrix element only); the Z
+# is kept stable (no `unstable` keyword). Standalone Pythia8
+# (pythia/LheToHepMC) reads the LHE and performs the decay, showering,
+# and hadronization, giving the Z independent color flow.
+#
+# Decay channel for the LHE route is NOT set here (no $ps_PYTHIA8_config,
+# since Whizard does no showering). It is carried by the LHE_DECAY
+# directive below, which gen/whizard_lhe.sh greps and passes to
+# LheToHepMC. Here we force Z -> hadrons (u,d,s,c,b; no leptons/neutrinos).
+# (If the directive is absent, LheToHepMC falls back to its ZH default of
+#  Z->bb, H->bb — which is wrong for this process, so keep the line.)
+#
+# LHE_DECAY: 23:mayDecay = on; 23:onMode = off; 23:onIfAny = 1 2 3 4 5
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+# WW-fusion single-Z production; Z left stable for Pythia8 (LheToHepMC)
+process vbfz = "e2", "E2" => "n2", "N2", "Z"
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all Pt > 500 GeV [Z] and
+       all abs (Eta) < 2.3 [Z]
+
+# No shower/hadronization in Whizard — Pythia8 (LheToHepMC) handles everything
+?ps_fsr_active        = false
+?hadronization_active = false
+?allow_shower         = false
+
+integrate (vbfz) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfz) {
+  n_events = 10
+  sample_max_tries = 100000
+  $sample = "mumu_vbfZ_qq_pt500_lhe_10TeV"
+  sample_format = lhef
+}
