@@ -33,7 +33,7 @@ def append(title, lines):
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     sha, dirty = git_ref()
     state = "DIRTY — SHA does NOT capture the exact code" if dirty else "clean"
-    body = "\n".join(f"- {ln}" for ln in lines)
+    body = "\n".join(lines)   # callers supply their own "- "/"  - " bullets
     entry = f"\n## {ts} — {title}\n- commit: `{sha}` ({state})\n{body}\n"
     if not LOG.exists():
         LOG.write_text("# Production log\n\n"

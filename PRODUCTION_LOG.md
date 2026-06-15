@@ -28,3 +28,9 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
   - `vbfZ_qq_pt500_pythia`: 34745043-34745145, afterok:34744630 -> `output/batch/vbfZ_qq_pt500_pythia/`
   - `lnuqq_Wmass_pt250`: 34745146-34745245, afterok:34744633 -> `output/batch/lnuqq_Wmass_pt250/`
   - `nunubb_Hmass_pt250`: 34745246-34745361, afterok:34744634 -> `output/batch/nunubb_Hmass_pt250/`
+
+## 2026-06-15 17:33:26 — submit.py production
+- commit: `3da846af8cc1bf12ba4a7e2fab1210e1d70fd99a` (clean)
+- params: `-n 100 -e 50`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `vbfZ_qq_pt500_lhe`: 100 jobs (ids 34747550–34747662) → `output/batch/vbfZ_qq_pt500_lhe/`

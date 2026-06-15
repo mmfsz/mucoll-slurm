@@ -162,7 +162,7 @@ apptainer exec --cleanenv --bind {DATA_DIR_TO_BIND} {APPTAINER_IMAGE} bash -c '
 
 # Provenance log.
 if submitted:
-    lines = ["gridpacks:"]
+    lines = ["- gridpacks:"]
     for name, jid, wd in submitted:
         lines.append(f"  - `{name}`: jobid {jid} → `{os.path.relpath(wd, WORK_DIR)}/`")
     sha, dirty = provlog.append("make_gridpack.py", lines)

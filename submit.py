@@ -174,7 +174,7 @@ echo "Host: $(hostname)   Sample: {label}   Job: {job_id}"
         if args.tag:   params += f" --tag {args.tag}"
         if args.qos:   params += f" --qos {args.qos}"
         if args.after: params += f" --after {args.after}"
-        lines = [f"params: `{params}`  (output base `{output_base}`)", "production:"]
+        lines = [f"- params: `{params}`  (output base `{output_base}`)", "- production:"]
         for label, ids in submitted.items():
             rng = f"{min(ids, key=int)}–{max(ids, key=int)}" if ids else "none"
             dep = f", afterok:{args.after}" if args.after else ""
