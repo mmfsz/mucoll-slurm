@@ -5,6 +5,8 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
 `git checkout <sha>` to recover the exact code. Output dirs are relative to the
 `muoncollider/` parent (`output/gridpacks/<gp>/`, `output/batch/<sample>/`).
 
+**Container image** (all entries below): `ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main` (build 2026-02-19); `mucoll-sim.sif` sha256 `77246efe33b18bba6e0ac6babe2d03241660b586639c41cac135db4b0239e97d`.
+
 ---
 
 ## 2026-06-15 — gridpacks + ZH/VBF hadronic batch (backfilled by hand)
