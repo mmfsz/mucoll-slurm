@@ -102,3 +102,9 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
 - params: `-n 100 -e 50 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
 - production:
   - `vbfW_qq_pt500_lhe`: 100 jobs (ids 34862745–34862844) → `output/batch/vbfW_qq_pt500_lhe/`
+
+## 2026-06-16 16:47:11 — submit.py production
+- commit: `634be6f8ffe681f91cfef89505300cb93b4dc059` (clean)
+- params: `--indices [2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 94, 95, 96] -e 50 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `ZH_bbbb_whizard`: 48 jobs (ids 34864082–34864129) → `output/batch/ZH_bbbb_whizard/`
