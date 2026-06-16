@@ -135,7 +135,12 @@ squeue -u $USER
 - Container image: `ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main`
 - Spack stack: `mucoll-stack-2026-01-29`; Whizard 3.1.5; geometry MAIA_v0.
 - Benchmarks branch: `k4MuC` from `samf25/mucoll-benchmarks`.
-- Temp files in `/tmp/` to avoid `/blue` I/O contention.
+- Job scratch: `lib/stages.sh::setup_workdir` stages each job (~9 GB gen+sim+digi+reco) in
+  per-job node scratch `/scratch/local/$SLURM_JOB_ID` (large, isolated, auto-cleaned),
+  falling back to `/tmp` if unavailable. `submit.py` re-injects `SLURM_JOB_ID` via
+  `apptainer --env` (since `--cleanenv` strips it). This avoids `/blue` I/O contention AND
+  the shared-`/tmp` ENOSPC that was corrupting SIM ROOT output (`basket's WriteBuffer
+  failed` / missing `podio_metadata`).
 
 ### Seed convention (the seed bug — KEEP FIXED)
 Cards use `seed  = 1234`. The gen plugins use `sed "s/seed *=.*/seed = $((1234 + JOB_ID))/"`
