@@ -17,8 +17,12 @@ def git_ref():
     try:
         sha = subprocess.check_output(
             ["git", "-C", str(REPO), "rev-parse", "HEAD"], text=True).strip()
-        dirty = bool(subprocess.check_output(
-            ["git", "-C", str(REPO), "status", "--porcelain"], text=True).strip())
+        # Dirty = uncommitted CHANGES TO CODE. Ignore PRODUCTION_LOG.md itself — this
+        # logger appends to it, so it is expectedly modified and must not count as a
+        # dirty-code flag (it would otherwise falsely warn on every submit).
+        changed = subprocess.check_output(
+            ["git", "-C", str(REPO), "status", "--porcelain"], text=True).strip().splitlines()
+        dirty = any(not ln.endswith("PRODUCTION_LOG.md") for ln in changed if ln.strip())
         return sha, dirty
     except Exception:
         return "unknown", False
