@@ -10,10 +10,14 @@
 setup_workdir() {
     local base=/tmp
     if   [ -n "${SLURM_TMPDIR:-}" ] && [ -d "$SLURM_TMPDIR" ]; then base="$SLURM_TMPDIR"
-    elif [ -n "${SLURM_JOB_ID:-}" ] && [ -d "/scratch/local/$SLURM_JOB_ID" ]; then base="/scratch/local/$SLURM_JOB_ID"
+    elif [ -n "${SLURM_JOB_ID:-}" ] && [ -d /scratch/local ]; then base="/scratch/local/$SLURM_JOB_ID"
     fi
     WORKDIR="$base/mucoll_job_${1}_${RANDOM}"
-    mkdir -p "$WORKDIR"
+    if ! mkdir -p "$WORKDIR" 2>/dev/null; then
+        echo "WARN: cannot create $WORKDIR — falling back to /tmp" >&2
+        WORKDIR="/tmp/mucoll_job_${1}_${RANDOM}"
+        mkdir -p "$WORKDIR"
+    fi
     cd "$WORKDIR"
     echo "Working in $WORKDIR"
 }

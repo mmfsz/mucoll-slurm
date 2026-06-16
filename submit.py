@@ -142,7 +142,11 @@ def main():
             extra = " " + " ".join(args.pgun)
         print(f"\n--- {label} ---")
         for job_id in job_indices:
-            cmd = (f"apptainer exec --cleanenv {tag_env}--bind {MUONCOLLIDER_DIR} {IMAGE} "
+            # --cleanenv strips SLURM_* from the container, so re-inject SLURM_JOB_ID
+            # explicitly — lib/stages.sh needs it to stage on per-job /scratch/local
+            # (large node scratch) instead of the shared /tmp.
+            cmd = (f"apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID {tag_env}"
+                   f"--bind {MUONCOLLIDER_DIR} {IMAGE} "
                    f"bash {RUN_CHAIN} {key} {job_id} {args.nevents} {output_base} {BENCH}{extra}")
             slurm = f"""#!/bin/bash
 #SBATCH --job-name=mucoll_{label}_{job_id}
