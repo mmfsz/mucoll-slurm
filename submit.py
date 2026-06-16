@@ -83,7 +83,10 @@ def main():
     p.add_argument("--time", default="10:00:00", help="SLURM --time")
     p.add_argument("--mem", default="16G", help="SLURM --mem")
     p.add_argument("--cpus", type=int, default=4, help="SLURM --cpus-per-task")
-    p.add_argument("--qos", default=None, help="SLURM --qos (e.g. avery-b)")
+    p.add_argument("--qos", default="avery-b",
+                   help="SLURM --qos (default: avery-b — the burst queue; keeps long CPU "
+                        "jobs off the shared 'avery' qos that GPU jobs need). Use "
+                        "--qos avery to force the normal queue.")
     p.add_argument("--after", default=None, metavar="JOBID",
                    help="hold these jobs until SLURM job JOBID finishes OK "
                         "(afterok dependency) — e.g. chain production behind its gridpack")
@@ -176,7 +179,8 @@ echo "Host: $(hostname)   Sample: {label}   Job: {job_id}"
     # Provenance log (skip on dry-run / if nothing was submitted).
     n_sub = sum(len(v) for v in submitted.values())
     if not args.dry_run and n_sub:
-        params = f"-n {args.njobs} -e {args.nevents}"
+        params = (f"--indices {args.indices}" if args.indices else f"-n {args.njobs}")
+        params += f" -e {args.nevents}"
         if args.tag:   params += f" --tag {args.tag}"
         if args.qos:   params += f" --qos {args.qos}"
         if args.after: params += f" --after {args.after}"

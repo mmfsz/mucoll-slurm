@@ -96,7 +96,7 @@ python submit.py -s ZH_bbbb_pythia -n 50 -e 10   # 50 jobs x 10 events = 500 eve
 | `--time HH:MM:SS` | `10:00:00` | SLURM walltime per job |
 | `--mem SIZE` | `16G` | SLURM memory per job |
 | `--cpus N` | `4` | SLURM `--cpus-per-task` |
-| `--qos NAME` | none | SLURM QOS, e.g. `avery-b` (Avery burst queue) |
+| `--qos NAME` | `avery-b` | SLURM QOS. Default `avery-b` (burst queue) keeps long CPU jobs off the shared `avery` qos that GPU jobs draw CPUs from. Pass `--qos avery` to force the normal queue. |
 | `--after JOBID` | none | hold these jobs until SLURM job `JOBID` finishes OK (`afterok` dependency) — used to chain production behind its gridpack |
 | `--list` | — | print all samples (key, gen_type, card) and exit |
 | `--dry-run` | — | build the SLURM scripts but do **not** submit (inspect first) |

@@ -101,7 +101,9 @@ python submit.py -s nunuqq_Zmass_pt250 -n 10 -e 10 --dry-run
 ```
 
 Validates the selection + card existence (pre-flight) before submitting. SLURM defaults:
-`--time 10:00:00 --mem 16G --cpus 4` (override with `--time/--mem/--cpus/--qos`). Always
+`--time 10:00:00 --mem 16G --cpus 4 --qos avery-b` (override with `--time/--mem/--cpus/--qos`;
+`avery-b` is the burst queue — keeps long CPU jobs off the shared `avery` qos that GPU jobs
+draw CPUs from). Use `submit.py --indices N N …` to (re)submit specific job indices. Always
 passes `--cleanenv`. Replaces the old `submit_jobs.py`, `submit_scan.py` (pgun),
 `submit_vbf_inclusive_10k.py`, `submit_ZH_lhe_test.py`, `submit_ZH_CR_tests.py`.
 
