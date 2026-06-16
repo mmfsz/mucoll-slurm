@@ -2,9 +2,17 @@
 # lib/stages.sh — shared pipeline stages, identical across every sample.
 # Source this (do not exec). Operates in the current working dir ($WORKDIR).
 
-# setup_workdir <job_id> : create + cd into a unique /tmp workdir (exports WORKDIR)
+# setup_workdir <job_id> : create + cd into a unique per-job node-local scratch dir
+# (exports WORKDIR). Each job stages ~9 GB (gen+sim+digi+reco); prefer HPG's per-job
+# scratch /scratch/local/$SLURM_JOB_ID (large, isolated, auto-cleaned) over the shared
+# /tmp, whose cross-job exhaustion corrupted SIM ROOT output ("basket's WriteBuffer
+# failed" / missing podio_metadata). Falls back to /tmp off-cluster.
 setup_workdir() {
-    WORKDIR=/tmp/mucoll_job_${1}_${RANDOM}
+    local base=/tmp
+    if   [ -n "${SLURM_TMPDIR:-}" ] && [ -d "$SLURM_TMPDIR" ]; then base="$SLURM_TMPDIR"
+    elif [ -n "${SLURM_JOB_ID:-}" ] && [ -d "/scratch/local/$SLURM_JOB_ID" ]; then base="/scratch/local/$SLURM_JOB_ID"
+    fi
+    WORKDIR="$base/mucoll_job_${1}_${RANDOM}"
     mkdir -p "$WORKDIR"
     cd "$WORKDIR"
     echo "Working in $WORKDIR"
