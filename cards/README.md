@@ -74,6 +74,7 @@ while `mumu_vbfZ_qq_pt500_lhe` carries the Z→all-hadronic directive above.
 | `mumu_vbfW_incl_pt500_pythia` | `e2 E2 => ℓν W`, Pythia default BR | **Pt(W)>500** | — | M(ℓν tag)>150, \|η(W)\|<2.3 |
 | `mumu_vbfW_qq_pt500_whizard` | `e2 E2 => ℓν W`, Whizard W→qq | **Pt(W)>500** | — | M(ℓν tag)>150, \|η(W)\|<2.3 |
 | `mumu_vbfW_qq_pt500_pythia` | `e2 E2 => ℓν W`, Pythia W→qq | **Pt(W)>500** | — | M(ℓν tag)>150, \|η(W)\|<2.3 |
+| `mumu_vbfW_qq_pt500_lhe` | `e2 E2 => ℓν W`, decay in LheToHepMC (W→qq, all hadronic) | **Pt(W)>500** | — | M(ℓν tag)>150, \|η(W)\|<2.3 |
 | `mumu_WW_qqqq_whizardNoCR` | `e2 E2 => W+ W-`, Whizard both→qq, CR off | — | — | \|η(W)\|<2.3 |
 | `mumu_bbbb` | `e2 E2 => b B b B` (2→4, no resonance) | — | — | \|η(b)\|<2.3 |
 | `mumu_nunubb_Hmass_pt250` | `e2 E2 => νν̄ b B` (2→4) | Pt(b)>250 | **115–135** (H) | M(νν̄)>150, \|η(b)\|<2.3 |

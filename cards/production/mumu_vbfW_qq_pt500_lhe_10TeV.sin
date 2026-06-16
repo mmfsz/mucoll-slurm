@@ -1,0 +1,72 @@
+# mumu_vbfW_qq_pt500_lhe_10TeV  (LHE route: parton-level LHE from Whizard, shower in Pythia8)
+########################################################################
+# mu+ mu- -> l nu W  at 10 TeV  (VBF, charged current), pT(W) > 500 GeV
+# Both charges summed.
+#
+# Whizard produces a parton-level LHE file (matrix element only); the W
+# is kept stable (no `unstable` keyword). Standalone Pythia8
+# (pythia/LheToHepMC) reads the LHE and performs the decay, showering,
+# and hadronization, giving the W independent color flow.
+#
+# Decay channel for the LHE route is NOT set here (no $ps_PYTHIA8_config,
+# since Whizard does no showering). It is carried by the LHE_DECAY
+# directive below, which gen/whizard_lhe.sh greps and passes to
+# LheToHepMC. Here we force W -> hadrons (u,d,s,c,b; no leptons/neutrinos).
+# (If the directive is absent, LheToHepMC falls back to its ZH default of
+#  Z->bb, H->bb — which is wrong for this process, so keep the line.)
+#
+# LHE_DECAY: 24:mayDecay = on; 24:onMode = off; 24:onIfAny = 1 2 3 4 5
+#
+# This is the charged-current (W) analog of mumu_vbfZ_qq_pt500_lhe_10TeV,
+# and the LHE-route variant of mumu_vbfW_qq_pt500_pythia_10TeV.
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+# Tag-system aliases
+alias lTag  = e2:E2
+alias nuTag = n2:N2
+
+sqrts = 10 TeV
+seed  = 1234
+
+# VBF single-W production; W left stable for Pythia8 (LheToHepMC)
+process vbfw = "e2", "E2" => ("e2", "N2", "W+") + ("E2", "n2", "W-")
+
+compile
+
+cuts = all M  > 150 GeV [lTag, nuTag] and
+       all Pt > 5   GeV [lTag, nuTag] and
+       all Pt > 500 GeV ["W+", "W-"] and
+       all abs (Eta) < 2.3 ["W+", "W-"]
+
+# No shower/hadronization in Whizard — Pythia8 (LheToHepMC) handles everything
+?ps_fsr_active        = false
+?hadronization_active = false
+?allow_shower         = false
+
+integrate (vbfw) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfw) {
+  n_events = 10
+  sample_max_tries = 100000
+  $sample = "mumu_vbfW_qq_pt500_lhe_10TeV"
+  sample_format = lhef
+}

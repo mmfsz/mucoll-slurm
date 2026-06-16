@@ -60,3 +60,27 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
 - params: `-n 1 -e 50 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
 - production:
   - `vbfZ_qq_pt500_whizard`: 2 jobs (ids 34818840–34818841) → `output/batch/vbfZ_qq_pt500_whizard/`
+
+## 2026-06-16 11:46:21 — make_gridpack.py
+- commit: `397790a2b4072c0ad44f7e3a0f9bad9a7e707906` (DIRTY — SHA does NOT capture the exact code)
+- gridpacks:
+  - `vbfW`: jobid 34823027 → `output/gridpacks/mumu_vbfW_pt500_10TeV/`
+    (COMPLETED in 2m23s; wrote `vbfw.m1.vg` [W+], `vbfw.m2.vg` [W-].)
+
+## 2026-06-16 — vbfW_qq_pt500_lhe smoke test — NO production (STOPPED, inefficient gen)
+- New sample `vbfW_qq_pt500_lhe` (card `mumu_vbfW_qq_pt500_lhe_10TeV.sin`), the
+  charged-current LHE analog of `vbfZ_qq_pt500_lhe`. Card + samples.conf row + README
+  added, gridpack built (above) — but **NOT submitted to production.**
+- Smoke (`scripts/smoke_gen.sh vbfW_qq_pt500_lhe`, 5 and 50 events): Whizard
+  **actual unweighting efficiency = 0.00 %** (vs `vbfZ_qq_pt500_lhe` = 6.10 % under the
+  same recipe). The W+ component (`vbfw_i1`) integrates fine (Eff ~6-9 %, ~40 min/10k
+  events), but the W- component (`vbfw_i2`) has a pathological VAMP iteration (a 178 %
+  iteration with 56 % error spikes the weight ceiling) → integration Eff collapses to
+  0.00 and the time estimate balloons to ~5h51m/10k events. Same failure mode as the
+  inclusive `lnuqq_Wmass_pt250` (0.00 %, ~8 h/50 ev) that this sample was meant to fix.
+- HepMC content is physically correct (LHE_DECAY applied: W→u/d/s/c quarks → gluons,
+  pions, kaons; no leptonic W decays), so the mechanics work — the blocker is purely
+  unweighting efficiency, NOT a wiring bug.
+- Per the submit-only-if-efficient rule, production was **not** launched. Needs a fix
+  (e.g. tuning the W- integration / phase-space mapping, more `gw` warmup, or capping the
+  weight) before any `submit.py -s vbfW_qq_pt500_lhe`.
