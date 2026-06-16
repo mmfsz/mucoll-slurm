@@ -48,7 +48,7 @@ $hadronization_method = "PYTHIA8"
 # Pythia8: decay W+/W- as resonances; restrict to hadronic channels
 $ps_PYTHIA8_config = "24:mayDecay = on; 24:onMode = off; 24:onIfAny = 1 2 3 4 5"
 
-integrate (vbfw) { iterations = 5:50000:"gw", 10:100000 }
+integrate (vbfw) { iterations = 10:100000:"gw", 10:200000 }
 show(results)
 
 simulate (vbfw) {

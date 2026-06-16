@@ -89,6 +89,15 @@ while `mumu_vbfZ_qq_pt500_lhe` carries the Z→all-hadronic directive above.
 - Inclusive cards: `|η|<2.3` on the **final-state quarks** (not the neutrino/lepton tags).
 
 Notes:
+- **W integration (heavier warmup):** all W cards (inclusive `lnuqq_Wmass_pt250` and
+  the resonant `vbfW_*`, plus their gridpack counterparts) use
+  `iterations = 10:100000:"gw", 10:200000` instead of the standard `5:50000:"gw", 10:100000`.
+  The standard setting is insufficient for W's low unweighting efficiency — W needs more
+  VAMP warmup to stabilize the W⁻ channel (`vbfw_i2`/`wm_*`), which otherwise has a
+  pathological iteration that collapses the unweighting efficiency to ~0 % (~573 s/event,
+  job timeouts). The heavier integration restores GEN to ~seconds/event, confirmed against
+  the 2026-05-26 working `vbf_inclusive_production_10k` production. Z/H/ZH cards are fine at
+  the standard `5:50000` setting and are unchanged.
 - `nunuqq` (broad WW-fusion) and `nunuqq_Zmass_pt250` share the same final state;
   the `Zmass`/`pt250` region tags are what distinguish them.
 - `nunuqq`/`mumuqq` were inherited (orig. `WWZ_hadrons`/`ZZZ_hadrons`, M. LeBlanc) and

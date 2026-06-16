@@ -84,3 +84,9 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
 - Per the submit-only-if-efficient rule, production was **not** launched. Needs a fix
   (e.g. tuning the W- integration / phase-space mapping, more `gw` warmup, or capping the
   weight) before any `submit.py -s vbfW_qq_pt500_lhe`.
+
+## 2026-06-16 12:07:54 — make_gridpack.py
+- commit: `fc17a59bb26938ca879ae5dc83c5fbb7094d7b30` (DIRTY — SHA does NOT capture the exact code)
+- gridpacks:
+  - `lnuqq_Wmass_pt250`: jobid 34825174 → `output/gridpacks/mumu_lnuqq_Wmass_pt250_10TeV/`
+  - `vbfW`: jobid 34825175 → `output/gridpacks/mumu_vbfW_pt500_10TeV/`

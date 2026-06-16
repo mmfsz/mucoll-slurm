@@ -51,4 +51,4 @@ cuts = all M  > 150 GeV [lTag, nuTag] and
        all Pt > 250 GeV [any_jq, any_jQ] and
        all abs (Eta) < 2.3 [any_jq, any_jQ]
 
-integrate (vbfwqq) { iterations = 5:50000:"gw", 10:100000 }
+integrate (vbfwqq) { iterations = 10:100000:"gw", 10:200000 }

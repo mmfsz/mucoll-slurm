@@ -61,7 +61,7 @@ cuts = all M  > 150 GeV [lTag, nuTag] and
 ?hadronization_active = false
 ?allow_shower         = false
 
-integrate (vbfw) { iterations = 5:50000:"gw", 10:100000 }
+integrate (vbfw) { iterations = 10:100000:"gw", 10:200000 }
 show(results)
 
 simulate (vbfw) {
