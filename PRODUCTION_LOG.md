@@ -119,3 +119,9 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
 - commit: `26cd8094b542b91d75c2e8ef7d4a909a37273e57` (DIRTY — SHA does NOT capture the exact code)
 - gridpacks:
   - `vbfH`: jobid 34864864 → `output/gridpacks/mumu_vbfH_pt500_10TeV/`
+
+## 2026-06-16 16:55:17 — submit.py production
+- commit: `658142c2614dd26a403eceef4e5f74cef6a4a5fa` (clean)
+- params: `-n 100 -e 50 --qos avery-b --after 34864864`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `vbfH_bb_pt500_lhe`: 100 jobs (ids 34864943–34865042, afterok:34864864) → `output/batch/vbfH_bb_pt500_lhe/`
