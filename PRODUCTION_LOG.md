@@ -90,3 +90,15 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
 - gridpacks:
   - `lnuqq_Wmass_pt250`: jobid 34825174 → `output/gridpacks/mumu_lnuqq_Wmass_pt250_10TeV/`
   - `vbfW`: jobid 34825175 → `output/gridpacks/mumu_vbfW_pt500_10TeV/`
+
+## 2026-06-16 16:36:39 — submit.py production
+- commit: `da6452583d5ff9c0234cb68371538f17839b7d59` (clean)
+- params: `-n 100 -e 50 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `lnuqq_Wmass_pt250`: 100 jobs (ids 34862645–34862744) → `output/batch/lnuqq_Wmass_pt250/`
+
+## 2026-06-16 16:36:41 — submit.py production
+- commit: `da6452583d5ff9c0234cb68371538f17839b7d59` (clean)
+- params: `-n 100 -e 50 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `vbfW_qq_pt500_lhe`: 100 jobs (ids 34862745–34862844) → `output/batch/vbfW_qq_pt500_lhe/`
