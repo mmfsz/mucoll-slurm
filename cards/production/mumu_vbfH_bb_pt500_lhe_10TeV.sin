@@ -1,0 +1,61 @@
+# mumu_vbfH_bb_pt500_lhe_10TeV  (LHE route: parton-level LHE from Whizard, shower in Pythia8)
+########################################################################
+# mu+ mu- -> nu_mu nu_mu_bar H  at 10 TeV  (WW fusion), pT(H) > 500 GeV
+#
+# Whizard produces a parton-level LHE file (matrix element only); the H
+# is kept stable (no `unstable` keyword). Standalone Pythia8
+# (pythia/LheToHepMC) reads the LHE and performs the decay, showering,
+# and hadronization, giving the H independent color flow.
+#
+# Decay channel for the LHE route is set by the LHE_DECAY directive below,
+# which gen/whizard_lhe.sh greps and passes to LheToHepMC. Here we force
+# H -> b bbar (onIfAny = 5).
+#
+# LHE_DECAY: 25:mayDecay = on; 25:onMode = off; 25:onIfAny = 5
+#
+# Author: Maria Mazza
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+# WW-fusion single-H production; H left stable for Pythia8 (LheToHepMC)
+process vbfh = "e2", "E2" => "n2", "N2", "H"
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2, N2] and
+       all Pt > 500 GeV [H] and
+       all abs (Eta) < 2.3 [H]
+
+# No shower/hadronization in Whizard — Pythia8 (LheToHepMC) handles everything
+?ps_fsr_active        = false
+?hadronization_active = false
+?allow_shower         = false
+
+integrate (vbfh) { iterations = 5:50000:"gw", 10:100000 }
+show(results)
+
+simulate (vbfh) {
+  n_events = 10
+  sample_max_tries = 100000
+  $sample = "mumu_vbfH_bb_pt500_lhe_10TeV"
+  sample_format = lhef
+}

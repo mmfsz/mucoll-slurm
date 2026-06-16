@@ -67,6 +67,7 @@ while `mumu_vbfZ_qq_pt500_lhe` carries the Z→all-hadronic directive above.
 | `mumu_vbfH_incl_pt500_pythia` | `e2 E2 => νν̄ H`, Pythia default BR | **Pt(H)>500** | — | M(νν̄)>150, Pt(νν̄)>5, \|η(H)\|<2.3 |
 | `mumu_vbfH_bb_pt500_whizard` | `e2 E2 => νν̄ H`, Whizard H→bb | **Pt(H)>500** | — | M(νν̄)>150, Pt(νν̄)>5, \|η(H)\|<2.3 |
 | `mumu_vbfH_bb_pt500_pythia` | `e2 E2 => νν̄ H`, Pythia H→bb | **Pt(H)>500** | — | M(νν̄)>150, Pt(νν̄)>5, \|η(H)\|<2.3 |
+| `mumu_vbfH_bb_pt500_lhe` | `e2 E2 => νν̄ H`, decay in LheToHepMC (H→bb) | **Pt(H)>500** | — | M(νν̄)>150, Pt(νν̄)>5, \|η(H)\|<2.3 |
 | `mumu_vbfZ_incl_pt500_pythia` | `e2 E2 => νν̄ Z`, Pythia default BR | **Pt(Z)>500** | — | M(νν̄)>150, \|η(Z)\|<2.3 |
 | `mumu_vbfZ_qq_pt500_whizard` | `e2 E2 => νν̄ Z`, Whizard Z→qq (uds,c,b) | **Pt(Z)>500** | — | M(νν̄)>150, \|η(Z)\|<2.3 |
 | `mumu_vbfZ_qq_pt500_pythia` | `e2 E2 => νν̄ Z`, Pythia Z→qq | **Pt(Z)>500** | — | M(νν̄)>150, \|η(Z)\|<2.3 |
