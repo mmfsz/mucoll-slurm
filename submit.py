@@ -68,6 +68,10 @@ def main():
     p.add_argument("-s", "--samples", nargs="+", metavar="KEY",
                    help="sample keys from samples.conf")
     p.add_argument("-n", "--njobs", type=int, default=1, help="jobs per sample")
+    p.add_argument("--indices", type=int, nargs="+", metavar="N",
+                   help="submit exactly these job indices (instead of 0..njobs-1) — "
+                        "e.g. to rerun specific failed jobs; each keeps its original "
+                        "seed and output dir job_<N>/")
     p.add_argument("-e", "--nevents", type=int, default=10, help="events per job")
     p.add_argument("-o", "--output", default="output/batch",
                    help="output dir relative to muoncollider/ (default: output/batch)")
@@ -118,8 +122,10 @@ def main():
 
     qos_line = f"#SBATCH --qos={args.qos}\n" if args.qos else ""
     dep_line = f"#SBATCH --dependency=afterok:{args.after}\n" if args.after else ""
-    total = len(args.samples) * args.njobs
-    print(f"Submitting {len(args.samples)} sample(s) x {args.njobs} job(s) = {total} jobs")
+    job_indices = args.indices if args.indices else list(range(args.njobs))
+    total = len(args.samples) * len(job_indices)
+    print(f"Submitting {len(args.samples)} sample(s) x {len(job_indices)} job(s) = {total} jobs"
+          + (f" (indices {job_indices})" if args.indices else ""))
     print(f"Output: {output_base}")
 
     tag_env = f"--env RUN_TAG={args.tag} " if args.tag else ""
@@ -132,7 +138,7 @@ def main():
         if cfg["gen_type"] == "pgun" and args.pgun:
             extra = " " + " ".join(args.pgun)
         print(f"\n--- {label} ---")
-        for job_id in range(args.njobs):
+        for job_id in job_indices:
             cmd = (f"apptainer exec --cleanenv {tag_env}--bind {MUONCOLLIDER_DIR} {IMAGE} "
                    f"bash {RUN_CHAIN} {key} {job_id} {args.nevents} {output_base} {BENCH}{extra}")
             slurm = f"""#!/bin/bash
