@@ -104,8 +104,15 @@ Notes:
 - `nunuqq`/`mumuqq` were inherited (orig. `WWZ_hadrons`/`ZZZ_hadrons`, M. LeBlanc) and
   had never been run — smoke-test before trusting a production.
 - VBF boson pT cut is **500 GeV** (older notes said 600).
+- **Never quote particle names in a `cuts =` subevent** (KEEP FIXED — see the
+  parent `CLAUDE.md`). `["W+","W-"]` resolves to an empty set, so `all Pt>500 [∅]`
+  is vacuously true and the cut silently never fires. The W cards now use
+  `alias Wpm = "W+":"W-"` → `[Wpm]`. This (not VAMP warmup alone) was the real cause
+  of the vbfW `lhe` 0.00 % unweighting efficiency — with the cut active the boosted
+  phase space is well-behaved (~2.3 %). Fixed 2026-06-17 (commit `cb3724f`).
 - **Stale gridpack:** the `bbbb` cut changed (added `|η(b)|<2.3`), so the pre-computed
   `output/gridpacks/mumu_bbbb_10TeV` grids no longer match the card and must be
-  regenerated (`python make_gridpack.py bbbb`) before using that gridpack. The
-  other pre-computed grids (vbfZ, vbf*_inclusive) are unaffected — those cards were not
-  changed.
+  regenerated (`python make_gridpack.py bbbb`) before using that gridpack. Likewise
+  `mumu_vbfW_pt500_10TeV` was regenerated 2026-06-17 after the cut fix (old uncut grid
+  archived as `*.UNCUT_BROKEN_20260617`). The other pre-computed grids (vbfZ, vbfH,
+  vbf*_inclusive) are unaffected — those cards were not changed.

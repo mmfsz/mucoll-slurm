@@ -147,6 +147,19 @@ Cards use `seed  = 1234`. The gen plugins use `sed "s/seed *=.*/seed = $((1234 +
 (the `*` matters). The old one-space regex silently failed → every job ran seed 1234 →
 identical events. Always confirm distinct HepMC across jobs before trusting a production.
 
+### Cut convention (the quoted-particle bug — KEEP FIXED)
+In a Whizard `cuts =` expression, **never quote particle names in a subevent**:
+`all Pt > 500 GeV ["W+", "W-"]` resolves to an **empty set**, so `all <cond> [∅]` is
+vacuously true and the cut **silently never fires** (quoted names work in `process`
+lines but NOT in cuts). Built-in names (`[Z]`, `[H]`) and aliases (`[lTag]`) are fine;
+for particles whose name can't be written unquoted (`W+`/`W-` — the `+`/`-` are
+operators), define an alias: `alias Wpm = "W+":"W-"` then `[Wpm]`. The vbfW cards shipped
+with `["W+","W-"]` → the pt>500 / |η|<2.3 cut was void → W produced at pT~50 not >500,
+and the gridpack integrated at 30817 fb instead of ~527 fb (fixed 2026-06-17, commit
+`cb3724f`). **Always sanity-check a new card's integrated σ and the cut variable's
+distribution before trusting a production** — a cut that doesn't bite shows up as a σ
+orders of magnitude too large.
+
 ## Active study & graduation rule
 
 The current investigation — *the correct way to generate hadronic boson decays* — lives
