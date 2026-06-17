@@ -125,3 +125,20 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
 - params: `-n 100 -e 50 --qos avery-b --after 34864864`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
 - production:
   - `vbfH_bb_pt500_lhe`: 100 jobs (ids 34864943–34865042, afterok:34864864) → `output/batch/vbfH_bb_pt500_lhe/`
+
+## 2026-06-17 17:26:53 — submit.py production
+- commit: `e8594adf57de8741756d6e84299b0ccdf260e3c8` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 20 -e 50 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `ZH_bbbb_pythia`: 20 jobs (ids 35011004–35011023) → `output/batch/ZH_bbbb_pythia/`
+
+## 2026-06-17 19:03:38 — make_gridpack.py
+- commit: `cb3724fde5669d27392d3e00f6ce064175dfa275` (DIRTY — SHA does NOT capture the exact code)
+- gridpacks:
+  - `vbfW`: jobid 35021768 → `output/gridpacks/mumu_vbfW_pt500_10TeV/`
+
+## 2026-06-17 19:09:03 — submit.py production
+- commit: `cb3724fde5669d27392d3e00f6ce064175dfa275` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `vbfW_qq_pt500_lhe`: 100 jobs (ids 35022139–35022238) → `output/batch/vbfW_qq_pt500_lhe/`
