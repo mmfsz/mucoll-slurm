@@ -31,6 +31,10 @@ alias dquark = d:s
 # Tag-system aliases
 alias lTag  = e2:E2
 alias nuTag = n2:N2
+# W boson alias — MUST be used (unquoted) in cuts. A literal ["W+","W-"] in a
+# cut subevent is silently ignored by Whizard (resolves to an empty set, so the
+# pt/eta cut is vacuously true and never fires). Use [Wpm] instead.
+alias Wpm   = "W+":"W-"
 
 sqrts = 10 TeV
 seed  = 1234
@@ -49,8 +53,8 @@ compile
 
 cuts = all M  > 150 GeV [lTag, nuTag] and
        all Pt > 5   GeV [lTag, nuTag] and
-       all Pt > 500 GeV ["W+", "W-"] and
-       all abs (Eta) < 2.3 ["W+", "W-"]
+       all Pt > 500 GeV [Wpm] and
+       all abs (Eta) < 2.3 [Wpm]
 
 ?ps_fsr_active       = true
 ?hadronization_active = true

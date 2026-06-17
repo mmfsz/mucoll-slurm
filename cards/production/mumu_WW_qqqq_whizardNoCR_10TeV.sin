@@ -11,6 +11,9 @@ model = SM
 # W+ -> up-type + anti-down-type light quarks (u,d,s massless)
 alias Dbar   = D:S
 alias dquark = d:s
+# W boson alias — MUST be used (unquoted) in cuts. A literal ["W+","W-"] in a
+# cut subevent is silently ignored by Whizard (empty set -> cut never fires).
+alias Wpm    = "W+":"W-"
 
 # Masses and widths
 me     = 0d0
@@ -43,7 +46,7 @@ process wm_c = "W-" => dquark, C
 compile
 
 # Define cuts
-cuts = all abs (Eta) < 2.3 ["W+", "W-"]
+cuts = all abs (Eta) < 2.3 [Wpm]
 
 # Parton shower and hadronization via Pythia8
 ?ps_fsr_active = true
