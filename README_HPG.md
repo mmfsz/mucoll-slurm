@@ -284,11 +284,14 @@ same `--after <id>`.
 ## 7. Running the stages by hand (debugging)
 
 Sometimes you want to run one stage at a time — to debug a card or inspect intermediate
-files. Get a compute node, enter the container, and load the environment:
+files. Get a compute node, enter the container, and load the environment. **Run these
+from the `mucoll-slurm/` directory** — `scripts/` and `pythia/` are here, while
+`mucoll-benchmarks/` is its sibling one level up (hence the `../` prefixes below):
 
 ```bash
 source scripts/interact_hpg.sh     # compute node (don't run on the login node)
-source scripts/shell_hpg.sh        # enter the container
+source scripts/shell_hpg.sh        # enter the container (--cleanenv, so the host
+                                   #   `module load python` doesn't break Python here)
 source scripts/setup.sh            # load the spack software stack
 ```
 
@@ -296,8 +299,8 @@ Set the detector geometry once per shell (this also copies the Pandora settings 
 reconstruction needs into the current directory):
 
 ```bash
-cp -r mucoll-benchmarks/reconstruction/PandoraSettings/ ./
-source mucoll-benchmarks/k4MuCPlayground/setup_digireco.sh mucoll-benchmarks/ MAIA_v0
+cp -r ../mucoll-benchmarks/reconstruction/PandoraSettings/ ./
+source ../mucoll-benchmarks/k4MuCPlayground/setup_digireco.sh ../mucoll-benchmarks/ MAIA_v0
 # Confirm it prints MUCOLL_GEOM_NAME = MAIA_v0
 ```
 
@@ -306,22 +309,22 @@ card if you want a physics process):
 
 ```bash
 # GEN — particle gun: 1 electron, pT 100 GeV, theta 10–170 deg
-python mucoll-benchmarks/generation/pgun/pgun_edm4hep.py \
+python ../mucoll-benchmarks/generation/pgun/pgun_edm4hep.py \
     -p 1 -e 1 --pdg 11 --pt 100 --theta 10 170 -- gen_output.edm4hep.root
 
 # GEN — Whizard card instead (writes <sample>.hepmc; rename to gen_output.hepmc):
 #   whizard cards/production/mumu_ZH_bbbb_pythia_10TeV.sin
 
 # SIM — Geant4 detector simulation
-ddsim --steeringFile mucoll-benchmarks/simulation/steer_baseline.py \
+ddsim --steeringFile ../mucoll-benchmarks/simulation/steer_baseline.py \
     --numberOfEvents 1 --inputFiles gen_output.* --outputFile sim_output.edm4hep.root
 
 # DIGI
-k4run mucoll-benchmarks/digitization/digi_steer.py \
+k4run ../mucoll-benchmarks/digitization/digi_steer.py \
     --IOSvc.Input sim_output.edm4hep.root --IOSvc.Output digi_output.edm4hep.root
 
 # RECO
-k4run mucoll-benchmarks/reconstruction/reco_steer.py \
+k4run ../mucoll-benchmarks/reconstruction/reco_steer.py \
     --IOSvc.Input digi_output.edm4hep.root --IOSvc.Output reco_output.edm4hep.root
 ```
 

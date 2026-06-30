@@ -10,4 +10,8 @@ if [ ! -f "$APPTAINER_IMAGE" ]; then
     return 1 2>/dev/null || exit 1
 fi
 
-apptainer shell "$APPTAINER_IMAGE"
+# --cleanenv: don't inherit the host environment. interact_hpg.sh runs `module load
+# python`, which sets PYTHONHOME=/apps/python/3.10 on the host; without --cleanenv that
+# leaks into the container and breaks the spack Python ("No module named 'encodings'").
+# Matches the batch convention (submit.py always passes --cleanenv).
+apptainer shell --cleanenv "$APPTAINER_IMAGE"
