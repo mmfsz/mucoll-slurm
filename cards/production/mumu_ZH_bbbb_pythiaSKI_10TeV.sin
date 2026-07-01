@@ -38,7 +38,7 @@ process zhprod = "e2", "E2" => "Z", "H"
 
 compile
 
-cuts = all abs (Eta) < 2.3 [Z, H]
+cuts = all abs (Eta) < 2.3 [Z:H]
 
 # Parton shower and hadronization via Pythia8
 ?ps_fsr_active        = true

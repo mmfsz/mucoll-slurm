@@ -41,10 +41,10 @@ process vbfzqq = "e2", "E2" =>
 compile
 
 cuts = all M  > 150 GeV [n2, N2] and
-       all Pt > 5   GeV [n2, N2] and
+       all Pt > 5   GeV [n2:N2] and
        all M  > 80  GeV [any_q, any_Q] and
        all M  < 102 GeV [any_q, any_Q] and
-       all Pt > 250 GeV [any_q, any_Q] and
-       all abs (Eta) < 2.3 [any_q, any_Q]
+       all Pt > 250 GeV [any_q:any_Q] and
+       all abs (Eta) < 2.3 [any_q:any_Q]
 
 integrate (vbfzqq) { iterations = 5:50000:"gw", 10:100000 }

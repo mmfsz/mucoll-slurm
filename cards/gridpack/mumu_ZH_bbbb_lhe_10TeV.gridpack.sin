@@ -25,6 +25,6 @@ process zhprod = "e2", "E2" => "Z", "H"
 
 compile
 
-cuts = all abs (Eta) < 2.3 [Z, H]
+cuts = all abs (Eta) < 2.3 [Z:H]
 
 integrate (zhprod) { iterations = 5:50000:"gw", 10:100000 }

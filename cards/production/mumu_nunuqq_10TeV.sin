@@ -51,8 +51,8 @@ compile
 
 # Define cut on outgoing neutrinos to ensure we are in the VBF/VBS regime
 cuts = all M > 150 GeV [NNU, ANU] and
-       all Pt > 5 GeV [NNU, ANU] and
-       all abs (Eta) < 2.3 [any_q, any_Q]
+       all Pt > 5 GeV [NNU:ANU] and
+       all abs (Eta) < 2.3 [any_q:any_Q]
 
 # Parton shower and hadronization done with Pythia8 
 ?ps_fsr_active = true

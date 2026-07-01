@@ -44,8 +44,8 @@ process ww_to_hadrons = "e2", "E2" => ("n2", "N2", q_light, Q_light) + ("n2", "N
 compile
 
 cuts = all M > 150 GeV [NNU, ANU] and
-       all Pt > 5 GeV [NNU, ANU] and
-       all abs (Eta) < 2.3 [any_q, any_Q]
+       all Pt > 5 GeV [NNU:ANU] and
+       all abs (Eta) < 2.3 [any_q:any_Q]
 
 # High-statistics integration matching the production iteration parameters exactly.
 # Using identical parameters means production jobs start from the fully-converged

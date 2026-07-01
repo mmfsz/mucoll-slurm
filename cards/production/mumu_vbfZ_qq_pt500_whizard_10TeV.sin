@@ -41,7 +41,7 @@ process z_bb   = "Z" => b, B
 compile
 
 cuts = all M  > 150 GeV [n2, N2] and
-       all Pt > 5   GeV [n2, N2] and
+       all Pt > 5   GeV [n2:N2] and
        all Pt > 500 GeV [Z] and
        all abs (Eta) < 2.3 [Z]
 

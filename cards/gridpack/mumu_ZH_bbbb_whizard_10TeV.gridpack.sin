@@ -30,7 +30,7 @@ process hqq = "H" => q, qbar
 
 compile
 
-cuts = all abs (Eta) < 2.3 [Z, H]
+cuts = all abs (Eta) < 2.3 [Z:H]
 
 integrate (zqq)
 integrate (hqq)

@@ -33,10 +33,10 @@ process vbfhbb = "e2", "E2" => "n2", "N2", b, B
 compile
 
 cuts = all M  > 150 GeV [n2, N2] and
-       all Pt > 5   GeV [n2, N2] and
+       all Pt > 5   GeV [n2:N2] and
        all M  > 115 GeV [b, B] and
        all M  < 135 GeV [b, B] and
-       all Pt > 250 GeV [b, B] and
-       all abs (Eta) < 2.3 [b, B]
+       all Pt > 250 GeV [b:B] and
+       all abs (Eta) < 2.3 [b:B]
 
 integrate (vbfhbb) { iterations = 5:50000:"gw", 10:100000 }

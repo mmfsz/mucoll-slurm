@@ -47,8 +47,8 @@ compile
 # Define cut on outgoing muon-antimuon to ensure we are in the VBF/VBS regime
 # Helpful: https://whizard.hepforge.org/manual/manual006.html 
 cuts = all M > 150 GeV [e2, E2] and
-       all Pt > 5 GeV [e2, E2] and
-       all abs (Eta) < 2.3 [any_q, any_Q]
+       all Pt > 5 GeV [e2:E2] and
+       all abs (Eta) < 2.3 [any_q:any_Q]
 
 # Parton shower and hadronization done with Pythia8 
 ?ps_fsr_active = true

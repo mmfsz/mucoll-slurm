@@ -38,7 +38,7 @@ process bbbb = "e2", "E2" => b, B, b, B
 compile
 
 # Acceptance cut on the final-state b quarks (harmonized with the other inclusive cards)
-cuts = all abs (Eta) < 2.3 [b, B]
+cuts = all abs (Eta) < 2.3 [b:B]
 
 # High-statistics integration matching the production card parameters exactly.
 integrate (bbbb) { iterations = 5:50000:"gw", 10:100000 }

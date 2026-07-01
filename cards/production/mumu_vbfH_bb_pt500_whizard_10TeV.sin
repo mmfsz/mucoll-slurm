@@ -34,7 +34,7 @@ process hbb  = "H" => b, B
 compile
 
 cuts = all M  > 150 GeV [n2, N2] and
-       all Pt > 5   GeV [n2, N2] and
+       all Pt > 5   GeV [n2:N2] and
        all Pt > 500 GeV [H] and
        all abs (Eta) < 2.3 [H]
 

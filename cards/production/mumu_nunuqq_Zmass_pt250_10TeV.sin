@@ -53,11 +53,11 @@ compile
 #   - Boosted jets:  pT(each q) > 250 GeV   (Z at pT ~500 GeV -> each b ~ mZ/2 boosted)
 #   - Acceptance:    |eta(each q)| < 2.3
 cuts = all M  > 150 GeV [n2, N2] and
-       all Pt > 5   GeV [n2, N2] and
+       all Pt > 5   GeV [n2:N2] and
        all M  > 80  GeV [any_q, any_Q] and
        all M  < 102 GeV [any_q, any_Q] and
-       all Pt > 250 GeV [any_q, any_Q] and
-       all abs (Eta) < 2.3 [any_q, any_Q]
+       all Pt > 250 GeV [any_q:any_Q] and
+       all abs (Eta) < 2.3 [any_q:any_Q]
 
 ?ps_fsr_active       = true
 ?hadronization_active = true

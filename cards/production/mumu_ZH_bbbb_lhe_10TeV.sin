@@ -33,7 +33,7 @@ process zhprod = "e2", "E2" => "Z", "H"
 
 compile
 
-cuts = all abs (Eta) < 2.3 [Z, H]
+cuts = all abs (Eta) < 2.3 [Z:H]
 
 # No shower/hadronization in Whizard — Pythia8 will handle everything
 ?ps_fsr_active        = false

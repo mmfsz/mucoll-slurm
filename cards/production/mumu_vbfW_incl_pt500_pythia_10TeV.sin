@@ -44,7 +44,7 @@ compile
 
 # VBF tag-pair cut: (l-, nu_bar) for W+ events, (l+, nu) for W- events.
 cuts = all M  > 150 GeV [lTag, nuTag] and
-       all Pt > 5   GeV [lTag, nuTag] and
+       all Pt > 5   GeV [lTag:nuTag] and
        all Pt > 500 GeV [Wpm] and
        all abs (Eta) < 2.3 [Wpm]
 

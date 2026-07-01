@@ -35,7 +35,7 @@ process hqq = "H" => q, qbar
 compile
 
 # Define cuts
-cuts = all abs (Eta) < 2.3 [Z, H]
+cuts = all abs (Eta) < 2.3 [Z:H]
 
 # Parton shower and hadronization via Pythia8
 ?ps_fsr_active = true
