@@ -20,13 +20,15 @@ import subprocess
 import sys
 
 import provlog
+from mucoll_paths import benchmarks_path, bind_flags, image_path
 
 # --- Configuration ---
 SLURM_DIR             = os.path.dirname(os.path.abspath(__file__))
 WORK_DIR              = os.path.dirname(SLURM_DIR)
-MUCOLL_BENCHMARKS_PATH = os.path.join(WORK_DIR, "mucoll-benchmarks")
+MUCOLL_BENCHMARKS_PATH = str(benchmarks_path())   # see mucoll_paths.py
 GRIDPACK_DIR          = os.path.join(WORK_DIR, "output/gridpacks")
-APPTAINER_IMAGE       = os.path.join(SLURM_DIR, "mucoll-sim.sif")
+APPTAINER_IMAGE       = image_path()   # see lib/image.sh
+IMAGE_BINDS           = bind_flags()
 DATA_DIR_TO_BIND      = WORK_DIR
 LOG_DIR               = os.path.join(GRIDPACK_DIR, "logs")
 
@@ -124,7 +126,7 @@ echo "Whizard gridpack: {name}"
 echo "Host: $(hostname)"
 echo "========================================"
 
-apptainer exec --cleanenv --bind {DATA_DIR_TO_BIND} {APPTAINER_IMAGE} bash -c '
+apptainer exec --cleanenv {IMAGE_BINDS} --bind {DATA_DIR_TO_BIND} {APPTAINER_IMAGE} bash -c '
     set -e
     {ENV_SETUP}
     export OMP_NUM_THREADS=32

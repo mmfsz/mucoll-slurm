@@ -20,12 +20,14 @@ import sys
 from pathlib import Path
 
 import provlog
+from mucoll_paths import benchmarks_path, bind_flags, image_path
 
 SLURM_DIR = Path(__file__).resolve().parent
 MUONCOLLIDER_DIR = SLURM_DIR.parent
 MANIFEST = SLURM_DIR / "samples.conf"
-IMAGE = SLURM_DIR / "mucoll-sim.sif"
-BENCH = MUONCOLLIDER_DIR / "mucoll-benchmarks"
+IMAGE = image_path()          # see lib/image.sh
+IMAGE_BINDS = bind_flags()
+BENCH = benchmarks_path()     # see mucoll_paths.py
 RUN_CHAIN = SLURM_DIR / "run_chain.sh"
 GRIDPACK_BASE = MUONCOLLIDER_DIR / "output" / "gridpacks"
 
@@ -109,8 +111,11 @@ def main():
     unknown = [s for s in args.samples if s not in samples]
     if unknown:
         p.error(f"unknown sample(s): {', '.join(unknown)} (try --list)")
-    if not IMAGE.exists():
-        sys.exit(f"ERROR: container image not found: {IMAGE}")
+    # os.path.exists, not Path.exists: an unpacked CVMFS image is a directory,
+    # a pulled .sif is a file, and IMAGE is now a plain string either way.
+    if not os.path.exists(IMAGE):
+        sys.exit(f"ERROR: container image not found: {IMAGE}\n"
+                 "       Check MUCOLL_IMAGE / lib/image.sh, and that /cvmfs is mounted here.")
     if not BENCH.exists():
         sys.exit(f"ERROR: benchmarks not found: {BENCH}")
 
@@ -146,7 +151,7 @@ def main():
             # explicitly — lib/stages.sh needs it to stage on per-job /scratch/local
             # (large node scratch) instead of the shared /tmp.
             cmd = (f"apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID {tag_env}"
-                   f"--bind {MUONCOLLIDER_DIR} {IMAGE} "
+                   f"{IMAGE_BINDS} --bind {MUONCOLLIDER_DIR} {IMAGE} "
                    f"bash {RUN_CHAIN} {key} {job_id} {args.nevents} {output_base} {BENCH}{extra}")
             slurm = f"""#!/bin/bash
 #SBATCH --job-name=mucoll_{label}_{job_id}

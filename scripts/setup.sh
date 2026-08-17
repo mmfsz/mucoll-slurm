@@ -1,18 +1,21 @@
 #!/bin/bash
 
-#source /opt/spack/opt/spack/__spack_path_placeholder__/__spack_path_placeholder__/__spack_path_placeholder__/__spack_path_placeholder__/linux-x86_64/mucoll-stack-2025-11-11-qnljda2jpzad6mfv26pge4ux75mnbl3v/setup.sh
-# Expected spack stack for the current container image. Bump this string when the
-# image is bumped (it is the ONE place that names the stack, matched by glob below so
-# the __spack_path_placeholder__ hash need not be tracked here).
-_want_stack="mucoll-stack-2026-01-29"
-_stack_setup=$(ls /opt/spack/opt/spack/*/*/*/*/linux-x86_64/${_want_stack}-*/setup.sh 2>/dev/null | head -1)
-if [ -z "$_stack_setup" ]; then
-    echo "ERROR: expected spack stack '${_want_stack}' not found in this container." >&2
-    echo "       Your .sif is likely stale — re-pull the image:" >&2
-    echo "         apptainer pull --force mucoll-sim.sif docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main" >&2
+# Load the Spack software stack shipped with the container.
+#
+# /opt/setup_mucoll.sh is the image's own entrypoint helper and always names the
+# stack that image actually carries, so this survives image bumps with no edit
+# here. (It exists in every mucoll-sim image we use, 3.0 and 3.1 alike.) We need
+# it explicitly because `apptainer exec` bypasses the entrypoint — the upstream
+# setup docs call this out for exactly the batch-job case.
+#
+# Previously this globbed a hardcoded `mucoll-stack-<date>` string that had to be
+# bumped by hand on every image change.
+if [ -f /opt/setup_mucoll.sh ]; then
+    source /opt/setup_mucoll.sh
+    echo "Loaded spack stack: ${MUCOLL_RELEASE_VERSION:-unknown}"
 else
-    source "$_stack_setup"
-    echo "Loaded spack stack: ${_want_stack}"
+    echo "ERROR: /opt/setup_mucoll.sh not found — this is not a mucoll-sim container." >&2
+    echo "       Check MUCOLL_IMAGE (see lib/image.sh)." >&2
 fi
 
 export PS1="[\u@\h \w]\$ "

@@ -1,3 +1,8 @@
+> **Stale (pre-v3.1).** These Brown/OSCAR instructions still describe the 2.x/3.0 layout
+> (`digitization/digi_steer.py`, `setup_digireco.sh`, a hardcoded spack stack). The HPG
+> workflow moved to MAIA v3.1 — see `README_HPG.md`. Left as-is because it cannot be
+> tested from here; port it the same way if OSCAR is picked back up.
+
 ## Setup
 
 ### OSCAR

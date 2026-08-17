@@ -2,7 +2,7 @@
 
 ## Overview
 
-Slurm batch framework for running the full muon collider simulation chain on **HiPerGator (HPG)**. Runs inside an Apptainer container (`mucoll-sim.sif`) with a Spack-managed software stack.
+Slurm batch framework for running the full muon collider simulation chain on **HiPerGator (HPG)**. Runs inside an Apptainer container with a Spack-managed software stack — by default the MAIA **v3.1** image unpacked on CVMFS, so there is no `.sif` to pull or keep in sync.
 
 **Repo**: `git@github.com:leblanc-lab/mucoll-slurm.git`
 
@@ -16,12 +16,13 @@ and all bookkeeping are shared.
 ```
 muoncollider/                         # Parent dir (MUONCOLLIDER_DIR)
 ├── mucoll-slurm/                     # This repo (SLURM_DIR)
-│   ├── mucoll-sim.sif                # Apptainer container (~8.9 GB)
 │   ├── run_chain.sh                  # ★ single dispatcher: <SAMPLE_KEY> <JOB_ID> <N> <OUT> <BENCH> [extra]
 │   ├── samples.conf                  # ★ sample manifest (key | gen_type | card | gridpack)
 │   ├── submit.py                     # ★ unified SLURM submitter (reads samples.conf)
 │   ├── make_gridpack.py              # VAMP grid pre-computation (uses cards/gridpack/)
+│   ├── mucoll_paths.py               # image + benchmarks resolution for the Python submitters
 │   ├── lib/
+│   │   ├── image.sh                  # ★ ONE place naming the container image (MUCOLL_IMAGE)
 │   │   ├── env.sh                    # ONE place for spack + Whizard lib paths (+ HepMC3 helper)
 │   │   └── stages.sh                 # shared workdir / gridpack / SIM·DIGI·RECO / output funcs
 │   ├── gen/                          # generator plugins (each defines generate())
@@ -38,12 +39,12 @@ muoncollider/                         # Parent dir (MUONCOLLIDER_DIR)
 │   ├── archive/cards/                # frozen legacy cards (benchmarks/ + whizard_repo/)
 │   └── (legacy: run_chain_*.sh, chains/, submit_jobs.py, submit_scan.py, submit_*.py,
 │         watchdog_vbf*) — superseded by the above; kept until parity is confirmed
-├── mucoll-benchmarks/                # External (samf25, branch k4MuC). We do NOT own it.
+├── mucoll-benchmarks-v3.1/           # External (MuonColliderSoft, v3.1). We do NOT own it.
 │   ├── generation/                   # pgun generator (+ legacy .sin, which we no longer read for owned cards)
 │   ├── simulation/                   # DDSim steering (steer_baseline.py)
-│   ├── digitization/                 # k4run digi_steer.py
-│   ├── reconstruction/               # k4run reco_steer.py + PandoraSettings/
-│   └── k4MuCPlayground/setup_digireco.sh
+│   ├── setup_config.sh               # ★ sets MUCOLL_GEO / MUCOLL_CONFIG for a geometry
+│   └── configs/<GEO>Config/          # ★ submodules: digi_steer.py, reco_steer.py, PandoraSettings/
+├── mucoll-benchmarks/                # pre-v3.1 checkout (samf25 k4MuC) — kept for `main`, unused here
 └── output/
     ├── batch/<SAMPLE_KEY>/job_<ID>/  # job outputs, grouped by sample
     └── gridpacks/<gridpack>/         # pre-computed VAMP grids (.vg); dir = gridpack-card stem
@@ -57,11 +58,12 @@ Every job runs **GEN → SIM → DIGI → RECO** (via `run_chain.sh`):
    (card → LHE → `pythia/LheToHepMC` → HepMC), `pgun` (→ `.edm4hep.root`),
    `pythia` (`pythia/MuMuToZH` → HepMC).
 2. **SIM** — `ddsim` (Geant4), geometry **MAIA_v0**.
-3. **DIGI** — `k4run digi_steer.py`.
-4. **RECO** — `k4run reco_steer.py` (Pandora).
+3. **DIGI** — `k4run $MUCOLL_CONFIG/$MUCOLL_CONFIG_NAME/digi_steer.py`.
+4. **RECO** — `k4run $MUCOLL_CONFIG/$MUCOLL_CONFIG_NAME/reco_steer.py` (Pandora).
 
-SIM/DIGI/RECO come from `mucoll-benchmarks` and are invoked by `lib/stages.sh`
-(identical for every sample). Outputs land in
+SIM comes from `mucoll-benchmarks-v3.1/simulation/`; DIGI/RECO steering comes from that
+geometry's config package (v3.1 — see the migration note below). Both are invoked by
+`lib/stages.sh`, identical for every sample. Outputs land in
 `output/batch/<SAMPLE_KEY>/job_<ID>/{gen,sim,digi,reco}_output_<ID>.*`.
 
 ## The manifest (`samples.conf`)
@@ -114,9 +116,9 @@ passes `--cleanenv`. Replaces the old `submit_jobs.py`, `submit_scan.py` (pgun),
 
 ```bash
 source scripts/interact_hpg.sh      # compute node
-./scripts/install_hpg.sh            # pull .sif + clone benchmarks (one-time)
+./scripts/install_hpg.sh            # check image + clone v3.1 benchmarks (one-time)
 
-# Build pythia binaries (one-time; rebuild only if .sif changes)
+# Build pythia binaries (one-time; rebuild only if the image changes)
 source scripts/shell_hpg.sh
 source scripts/setup.sh
 bash pythia/build.sh
@@ -130,17 +132,41 @@ squeue -u $USER
 ## Key Conventions
 
 - Paths derive from script location (`SLURM_DIR`, `MUONCOLLIDER_DIR`); no hardcoding.
-- spack + Whizard paths live **only** in `scripts/setup.sh` + `lib/env.sh` — update there
-  on an image bump (previously copy-pasted into ~9 scripts).
-- Container image: `ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:main`
-- Spack stack: `mucoll-stack-2026-01-29`; Whizard 3.1.5; geometry MAIA_v0.
-- Benchmarks branch: `k4MuC` from `samf25/mucoll-benchmarks`.
+- spack + Whizard paths live **only** in `scripts/setup.sh` + `lib/env.sh`, and both now
+  *discover* their targets rather than hardcode a spack hash — an image bump needs no edit.
+- Container image: named **only** in `lib/image.sh`, default
+  `/cvmfs/unpacked.cern.ch/ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.1-amd64`.
+  Override with `MUCOLL_IMAGE=/path/to/mucoll-sim.sif` — no code edit needed.
+- Spack stack: loaded via the image's own `/opt/setup_mucoll.sh`, so it follows the image
+  automatically (v3.1 = `mucoll-stack-2026-08-13`). Whizard 3.1.5; geometry MAIA_v0.
+- Benchmarks: `MuonColliderSoft/mucoll-benchmarks`, cloned **with submodules** to
+  `mucoll-benchmarks-v3.1/`. Override with `MUCOLL_BENCHMARKS`.
 - Job scratch: `lib/stages.sh::setup_workdir` stages each job (~9 GB gen+sim+digi+reco) in
   per-job node scratch `/scratch/local/$SLURM_JOB_ID` (large, isolated, auto-cleaned),
   falling back to `/tmp` if unavailable. `submit.py` re-injects `SLURM_JOB_ID` via
   `apptainer --env` (since `--cleanenv` strips it). This avoids `/blue` I/O contention AND
   the shared-`/tmp` ENOSPC that was corrupting SIM ROOT output (`basket's WriteBuffer
   failed` / missing `podio_metadata`).
+
+### MAIA v3.1 migration (2026-08-17)
+
+The chain was already Gaudi/`k4run`/EDM4hep, so the v3.1 removal of the Marlin/iLCSoft/LCIO
+path changed nothing here. What did change is where the configuration lives:
+
+- Digi/reco steering moved out of benchmarks' top-level `digitization/` and `reconstruction/`
+  into a **per-geometry config package**. `lib/stages.sh` now runs
+  `$MUCOLL_CONFIG/$MUCOLL_CONFIG_NAME/{digi,reco}_steer.py`, which `setup_config.sh` sets —
+  so switching `MUCOLL_GEOMETRY` to `MuSIC_v2`/`MuColl_v1` needs no edit.
+- `k4MuCPlayground/setup_digireco.sh` is now a shim; `run_chain.sh` calls
+  `setup_config.sh` directly (same two arguments).
+- The `cp -r reconstruction/PandoraSettings/ ./` in `run_chain.sh` is **gone**. v3.1 hands
+  Pandora an absolute settings path and rewrites the XML's internal relative references, so
+  reco no longer has to run from the directory holding `PandoraSettings/`.
+- The old `samf25` `k4MuC` benchmarks checkout is **not** compatible (no `setup_config.sh`,
+  no `configs/`). It is left in place; v3.1 lives beside it in `mucoll-benchmarks-v3.1/`.
+
+Validated end-to-end on 1 pgun muon event (gen→sim→digi→reco, 510 s): 80 collections out,
+1 `SiTracks` / 1 `PandoraPFOs` / 1 `PandoraClusters` / 1 `JetOut`.
 
 ### Seed convention (the seed bug — KEEP FIXED)
 Cards use `seed  = 1234`. The gen plugins use `sed "s/seed *=.*/seed = $((1234 + JOB_ID))/"`

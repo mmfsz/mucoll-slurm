@@ -46,14 +46,24 @@ stage_sim_digi_reco() {
         --outputFile sim_output.edm4hep.root
     echo "Simulation took $((SECONDS - t))s"
 
+    # v3.1 moved the digi/reco steering out of benchmarks' top-level
+    # digitization/ and reconstruction/ directories into a per-geometry config
+    # package. $MUCOLL_CONFIG/$MUCOLL_CONFIG_NAME is set by setup_config.sh, so
+    # these two commands are geometry-agnostic: switching MUCOLL_GEOMETRY to
+    # MuSIC_v2 or MuColl_v1 picks up that geometry's steering with no edit here.
+    local CONFIG="$MUCOLL_CONFIG/$MUCOLL_CONFIG_NAME"
+    [ -f "$CONFIG/digi_steer.py" ] || {
+        echo "ERROR: no digi_steer.py under $CONFIG — was setup_config.sh sourced?" >&2
+        return 1; }
+
     t=$SECONDS; echo "--- Digitization ---"
-    k4run "$BENCH/digitization/digi_steer.py" \
+    k4run "$CONFIG/digi_steer.py" \
         --IOSvc.Input sim_output.edm4hep.root \
         --IOSvc.Output digi_output.edm4hep.root
     echo "Digitization took $((SECONDS - t))s"
 
     t=$SECONDS; echo "--- Reconstruction ---"
-    k4run "$BENCH/reconstruction/reco_steer.py" \
+    k4run "$CONFIG/reco_steer.py" \
         --IOSvc.Input digi_output.edm4hep.root \
         --IOSvc.Output reco_output.edm4hep.root
     echo "Reconstruction took $((SECONDS - t))s"

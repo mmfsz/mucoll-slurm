@@ -64,12 +64,16 @@ fi
 # Environment, shared stages, detector geometry, and the generator plugin.
 source "$SLURM_DIR/lib/env.sh"
 source "$SLURM_DIR/lib/stages.sh"
-source "$BENCH/k4MuCPlayground/setup_digireco.sh" "$BENCH" "$GEO"
+# v3.1 renamed this entry point; k4MuCPlayground/setup_digireco.sh survives only
+# as a shim that delegates here with the same two arguments.
+source "$BENCH/setup_config.sh" "$BENCH" "$GEO"
 [ -f "$SLURM_DIR/gen/${GEN_TYPE}.sh" ] || { echo "ERROR: unknown gen_type '$GEN_TYPE'" >&2; exit 1; }
 source "$SLURM_DIR/gen/${GEN_TYPE}.sh"
 
 setup_workdir "$JOB_ID"
-cp -r "$BENCH/reconstruction/PandoraSettings/" ./
+# No PandoraSettings copy: v3.1's config package hands Pandora an absolute path
+# and rewrites the relative references inside the settings XML, so reconstruction
+# no longer has to run from the directory holding PandoraSettings/.
 
 echo "--- Generation ($GEN_TYPE) ---"
 t=$SECONDS; generate; echo "Generation took $((SECONDS - t))s"

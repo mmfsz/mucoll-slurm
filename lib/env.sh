@@ -12,9 +12,16 @@ SLURM_DIR="$(dirname "$_ENV_DIR")"
 source "$SLURM_DIR/scripts/setup.sh"
 
 # --- Whizard shared libraries ---
-# THE one place this path is defined. Update here on a container/image bump.
-export WHIZARD_LIB="/opt/spack/opt/spack/__spack_path_placeholder__/__spack_path_placeholder__/__spack_path_placeholder__/__spack_path_placeholder__/linux-x86_64/whizard-3.1.5-2wpmahrsf5vaircj7tmf5hdo5fwz2hhw/lib"
-export LD_LIBRARY_PATH="$WHIZARD_LIB:$LD_LIBRARY_PATH"
+# Discovered from the spack tree rather than hardcoded: the spack hash changes on
+# every image rebuild even when the Whizard version does not (v3.0 and v3.1 both
+# ship 3.1.5 under different hashes), so a pasted path silently rots.
+WHIZARD_LIB="$(ls -d /opt/spack/opt/spack/*/*/*/*/linux-x86_64/whizard-*/lib 2>/dev/null | head -1)"
+if [ -n "$WHIZARD_LIB" ]; then
+    export WHIZARD_LIB
+    export LD_LIBRARY_PATH="$WHIZARD_LIB:$LD_LIBRARY_PATH"
+else
+    echo "WARN: no whizard lib directory found under /opt/spack — generation will fail" >&2
+fi
 
 # Add HepMC3 libraries to LD_LIBRARY_PATH (needed by the standalone pythia/
 # binaries). Discovered dynamically from the spack tree so it survives image bumps.
