@@ -163,7 +163,7 @@ orders of magnitude too large.
 ## Active study & graduation rule
 
 The current investigation — *the correct way to generate hadronic boson decays* — lives
-in `studies/hadronic_boson_decays/` (`PLAN.md`, `RESULTS.md`, `README.md`).
+in `studies/generators_validation_conejets/` (`PLAN.md`, `RESULTS.md`, `README.md`).
 
 **Generation method verdicts** (graduate in from the study once definitive — one line +
 link to the `RESULTS.md` section that proves it):
