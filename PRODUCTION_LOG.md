@@ -142,3 +142,61 @@ that generated the jobs, their SLURM ids, and their output directories — so yo
 - params: `-n 100 -e 50 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
 - production:
   - `vbfW_qq_pt500_lhe`: 100 jobs (ids 35022139–35022238) → `output/batch/vbfW_qq_pt500_lhe/`
+
+## 2026-06-30 — Whizard cut-syntax bug (Pt/Eta comma vs colon): samples carry the wrong fiducial cut → flagged for regen
+**No jobs submitted here — this is a bookkeeping entry.** NOTE: this bug does **not** invalidate
+any study *conclusion* — the authors confirmed the findings, and the cut is a
+selection/efficiency effect. Only the event *samples* carry the wrong fiducial region.
+
+The Whizard authors confirmed a cut-syntax bug in our cards (manual §5.2.6): for `Pt` and
+`Eta`, a **comma** `[a, b]` gives the observable of the *combined a+b system*, while a
+**colon** `[a:b]` gives it *per particle*. Our per-particle acceptance cuts used the comma
+form, so e.g. `all Pt > 250 GeV [any_q, any_Q]` cut on the qq̄-system pT (≈ Z pT) instead of
+each jet's pT. Authors confirmed this shifts selection efficiency by **up to an order of
+magnitude** (it does NOT cause the BR bias or the ZH colour-reconnection shoulder — those are
+separate, genuine Whizard issues they are fixing). Invariant-mass (`M`) cuts and single-particle
+brackets (`[Z]`,`[H]`,`[Wpm]`) were always correct. Full write-up:
+`studies/generators_validation_conejets/RESULTS.md` → "Whizard author correspondence & cut-syntax bug".
+
+- **Card fix applied** in `cards/` (34 files, production + gridpack): every `Pt`/`Eta` comma
+  bracket → colon; all `M` cuts left as comma. **UNCOMMITTED in mucoll-slurm at time of writing**
+  — commit before regenerating so the SHA below can be filled in.
+- **Frozen buggy cards** (as sent to the authors):
+  `studies/generators_validation_conejets/whizard_report_cards_buggy/` (README carries a warning).
+
+**Tier A — samples selected with the buggy cut → regenerate for the intended fiducial region**
+(the study *conclusions* still hold; this is about the acceptance, not the verdict). Two sub-cases:
+- `*_pt250` samples: the cut change is *real* — it was cutting on the qq̄/system pT, so the
+  intended "each jet pT > 250 GeV" boosted region was never actually applied. Regenerate.
+- `ZH_bbbb_*`: the `[Z, H]` η cut was essentially *inert* (back-to-back ZH ⇒ system η ≈ 0, cut
+  passes everything), so these are valid full-acceptance samples and the CR conclusion is
+  unaffected. Regenerate only to impose the correct per-boson |η|<2.3 fiducial cut.
+
+Existing output renamed with suffix `.BUGGY_CUT_20260630`:
+  - batch: `nunuqq_Zmass_pt250`, `nunubb_Hmass_pt250`, `lnuqq_Wmass_pt250`,
+    `ZH_bbbb_lhe`, `ZH_bbbb_pythia`, `ZH_bbbb_whizard`
+  - gridpacks: `mumu_nunuqq_Zmass_pt250_10TeV`, `mumu_nunubb_Hmass_pt250_10TeV`,
+    `mumu_lnuqq_Wmass_pt250_10TeV`, `mumu_ZH_bbbb_lhe_10TeV`, `mumu_ZH_bbbb_whizard_10TeV`
+  - Regen order: `make_gridpack.py nunuqq_Zmass_pt250 nunubb_Hmass_pt250 lnuqq_Wmass_pt250 ZH_bbbb_lhe ZH_bbbb_whizard`
+    then resubmit dependents (`nunuqq_Zmass_pt250`; `nunubb_Hmass_pt250`; `lnuqq_Wmass_pt250`;
+    `ZH_bbbb_lhe`+`ZH_bbbb_pythia` share the `ZH_bbbb_lhe` gridpack; `ZH_bbbb_whizard`
+    integrates inline). Sanity-check the new integrated σ (the `*_pt250` σ should drop
+    ~an order of magnitude) before trusting the reruns.
+
+**Tier B — change is only the soft `Pt>5 [tag]` cut (boson `Pt`/`η` used single-particle
+brackets, never buggy): STILL VALID, NOT renamed, no regen needed.**
+  - batch (kept): `vbfZ_qq_pt500_{lhe,pythia,whizard}`, `vbfW_qq_pt500_lhe`, `vbfH_bb_pt500_lhe`
+  - gridpacks (kept): `mumu_vbfZ_pt500_10TeV`, `mumu_vbfW_pt500_10TeV`, `mumu_vbfH_pt500_10TeV`
+
+**Unaffected** (no cards / cuts): `pgun`, `pythia_ZH`, `WW_qqqq_whizardNoCR`.
+
+## 2026-06-30 21:20:28 — make_gridpack.py
+- commit: `d27115704003749cbdf2d6f93c2113cd72d4144f` (clean)
+- gridpacks:
+  - `ZH_bbbb_lhe`: jobid 36117414 → `output/gridpacks/mumu_ZH_bbbb_lhe_10TeV/`
+
+## 2026-06-30 21:23:06 — submit.py production
+- commit: `d27115704003749cbdf2d6f93c2113cd72d4144f` (clean)
+- params: `-n 100 -e 50 --qos avery-b --after 36117414`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `ZH_bbbb_lhe`: 100 jobs (ids 36117482–36117581, afterok:36117414) → `output/batch/ZH_bbbb_lhe/`
