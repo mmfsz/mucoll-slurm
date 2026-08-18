@@ -271,3 +271,38 @@ shared-`/tmp` ENOSPC that once corrupted SIM output is not a risk at this scale.
 - params: `-n 100 -e 50 --tag v3p1 --qos avery-b`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
 - production:
   - `ZH_bbbb_lhe_v3p1`: 100 jobs (ids 39618437–39618536) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p1/`
+
+## 2026-08-18 — ZH_bbbb_lhe_v3p1 first attempt CANCELLED (physics-list slowdown)
+**Read the two `ZH_bbbb_lhe_v3p1` entries above together:** the 11:35 submission (ids
+39618437–39618536, `--time 4-00:00:00`) **supersedes** the 09:35 one (ids 39613195–39613299,
+`--time 20:00:00`), which was cancelled ~1 h in. No output was lost — `move_outputs` runs
+only after RECO, so those jobs had written nothing.
+
+**Why.** v3.1 SIM runs 4–8× slower than the June production, and ZH would not have fitted in
+the 20 h limit (measured 824–1174 s/event → 11–16 h of SIM alone, before RECO). Cause is a
+one-line difference in the simulation steering, not a misconfiguration on our side:
+
+```
+mucoll-benchmarks      (June): SIM.physics.list = "QGSP_BERT"
+mucoll-benchmarks-v3.1 (now):  SIM.physics.list = "FTFP_BERT_HP"
+```
+
+`_HP` is high-precision neutron transport (thermal neutrons down to meV), routinely 5–10×
+slower in calorimeter-heavy geometries. Measured rates, v3.1 vs June:
+
+| sample | June (QGSP_BERT) | v3.1 (FTFP_BERT_HP) |
+|---|---|---|
+| vbfH | 38 s/event | 141–312 s/event |
+| ZH | 236 s/event | 824–1174 s/event |
+
+**Decision (Maria, 2026-08-18): keep the v3.1 default `FTFP_BERT_HP`** — it is the baseline
+we will actually use going forward. The consequence to remember when comparing against the
+June samples is that the difference includes the physics list, not only the image and the
+config-package move. The 300 vbf jobs already in flight were left to finish (they fit in
+10 h); only ZH needed the longer walltime. A walltime cannot be raised on a running job
+(`scontrol update TimeLimit` is operator-only), which is why resubmission was the only route.
+
+**Note:** the resubmitted ZH writes to the new default root
+`/cmsuf/data/store/user/mmazza/mucoll/samples/`, while the three vbf samples of this
+production still land on `/blue` (they were submitted before the default changed) and are
+synced across afterwards.
