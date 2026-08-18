@@ -161,7 +161,7 @@ python submit.py -s ZH_bbbb_pythia -n 50 -e 10   # 50 jobs x 10 events = 500 eve
 | `-s, --samples KEY [KEY …]` | — | one or more sample keys from `samples.conf` (run several at once) |
 | `-n, --njobs N` | `1` | number of SLURM jobs per sample |
 | `-e, --nevents N` | `10` | events generated per job (total/sample = `njobs × nevents`) |
-| `-o, --output DIR` | `output/batch` | output dir, relative to the `muoncollider/` parent |
+| `-o, --output DIR` | `$MUCOLL_OUTPUT/samples` | output dir (absolute, or relative to the `muoncollider/` parent). The default resolves to `/cmsuf/data/store/user/<you>/mucoll/samples` — see section 4 |
 | `--tag LABEL` | none | suffix added to the output folder + log/job names; lets you run the **same** sample twice without overwriting |
 | `--pgun PDG PT TMIN TMAX` | `11 100 10 170` | particle-gun parameters (only used by the `pgun` sample) |
 | `--time HH:MM:SS` | `10:00:00` | SLURM walltime per job |
@@ -226,22 +226,40 @@ squeue -u $USER                                  # all your jobs
 squeue -u $USER -h -o "%T" | sort | uniq -c      # count by state (PENDING/RUNNING/…)
 squeue -u $USER -t RUNNING                        # what's actually running now
 scontrol show job <JOBID> | grep -i dependency    # confirm a chained job's dependency
-ls output/batch/                                  # samples appear here as they produce
-tail -f output/batch/logs/<sample>_job_0.out      # follow a job's log
+ls $(python3 -c 'import mucoll_paths as m; print(m.samples_base())')   # samples appear here
+tail -f .../samples/logs/<sample>_job_0.out       # follow a job's log
 ```
 
 ---
 
 ## 4. Output
 
+Productions are written to **`/cmsuf/data/store/user/<you>/mucoll/`**, not `/blue`.
+`/blue` is a shared group quota with little headroom left (~14 T of 119 T for all of
+`avery`), while `/cmsuf` is Lustre with hundreds of TB free — and a single full-chain
+production of 4 samples is ~1.3 T, since every stage is kept.
+
 ```
-output/batch/<sample_key>[_<tag>]/job_<id>/
+<base>/samples/<sample_key>[_<tag>]/job_<id>/
     gen_output_<id>.hepmc            # or .edm4hep.root for pgun
     sim_output_<id>.edm4hep.root
     digi_output_<id>.edm4hep.root
     reco_output_<id>.edm4hep.root
-output/batch/logs/<sample_key>[_<tag>]_job_<id>.{out,err}
+<base>/samples/logs/<sample_key>[_<tag>]_job_<id>.{out,err}
+<base>/gridpacks/<gridpack>/*.vg
 ```
+
+`<base>` is resolved by `mucoll_paths.py` and is easy to see or override:
+
+```bash
+python3 -c 'import mucoll_paths as m; print(m.output_base(), m.samples_base(), m.gridpack_base())'
+MUCOLL_OUTPUT=/somewhere/else python submit.py ...    # override the root
+MUCOLL_GRIDPACKS=/path/to/grids python submit.py ...  # override just the grids
+```
+
+The directory is called `samples/` (it used to be `batch/`) because it says what is in
+it, matching `gridpacks/` beside it — `batch` described how the files were made, not what
+they are. A `batch -> samples` symlink is kept at the root so older paths still resolve.
 
 Outputs are grouped by sample (folder = `<sample_key>`, plus `_<tag>` if you passed
 `--tag`), so one folder holds the whole production of a sample.

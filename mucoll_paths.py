@@ -46,3 +46,57 @@ def bind_flags():
 def benchmarks_path():
     """Return the mucoll-benchmarks checkout to run against."""
     return Path(os.environ.get("MUCOLL_BENCHMARKS", DEFAULT_BENCHMARKS))
+
+
+# --- Where productions are written -------------------------------------------
+# Samples outgrew /blue: the avery group sits at ~105 T of its 119 T quota,
+# while /cmsuf (Lustre) has ~777 T free. Everything below is overridable, so a
+# different cluster — or a user without a /cmsuf area — still works unedited.
+
+CMSUF_USER_ROOT = Path("/cmsuf/data/store/user")
+LEGACY_OUTPUT = SLURM_DIR.parent / "output"
+
+
+def _cmsuf_user_dir():
+    """This user's /cmsuf area, or None.
+
+    The HPG username and the /cmsuf directory name do not always match
+    (`m.mazza` -> `mmazza`), so try the username as-is and then with dots
+    removed, taking the first that exists rather than assuming a rule.
+    """
+    user = os.environ.get("USER", "")
+    for name in (user, user.replace(".", "")):
+        if name:
+            d = CMSUF_USER_ROOT / name
+            if d.is_dir():
+                return d
+    return None
+
+
+def output_base():
+    """Root holding `samples/` and `gridpacks/` (MUCOLL_OUTPUT overrides)."""
+    env = os.environ.get("MUCOLL_OUTPUT")
+    if env:
+        return Path(env)
+    d = _cmsuf_user_dir()
+    return d / "mucoll" if d else LEGACY_OUTPUT
+
+
+def samples_base():
+    """Where production samples land (was `output/batch`, now `<base>/samples`)."""
+    return output_base() / "samples"
+
+
+def gridpack_base():
+    """Where VAMP grids live (MUCOLL_GRIDPACKS overrides).
+
+    Prefers `<base>/gridpacks`, but only once that directory exists — so grids
+    keep resolving to the legacy location until they are migrated, and the
+    switch happens the moment they are. No flag day, and no window where a
+    production silently re-integrates because it looked in an empty new dir.
+    """
+    env = os.environ.get("MUCOLL_GRIDPACKS")
+    if env:
+        return Path(env)
+    cand = output_base() / "gridpacks"
+    return cand if cand.is_dir() else LEGACY_OUTPUT / "gridpacks"

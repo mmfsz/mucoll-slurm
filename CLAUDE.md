@@ -64,7 +64,8 @@ Every job runs **GEN → SIM → DIGI → RECO** (via `run_chain.sh`):
 SIM comes from `mucoll-benchmarks-v3.1/simulation/`; DIGI/RECO steering comes from that
 geometry's config package (v3.1 — see the migration note below). Both are invoked by
 `lib/stages.sh`, identical for every sample. Outputs land in
-`output/batch/<SAMPLE_KEY>/job_<ID>/{gen,sim,digi,reco}_output_<ID>.*`.
+`<base>/samples/<SAMPLE_KEY>/job_<ID>/{gen,sim,digi,reco}_output_<ID>.*`, where `<base>`
+is `/cmsuf/data/store/user/<you>/mucoll` (see Key Conventions).
 
 ## The manifest (`samples.conf`)
 
@@ -141,6 +142,15 @@ squeue -u $USER
   automatically (v3.1 = `mucoll-stack-2026-08-13`). Whizard 3.1.5; geometry MAIA_v0.
 - Benchmarks: `MuonColliderSoft/mucoll-benchmarks`, cloned **with submodules** to
   `mucoll-benchmarks-v3.1/`. Override with `MUCOLL_BENCHMARKS`.
+- Output location: resolved **only** in `mucoll_paths.py` (`output_base` / `samples_base` /
+  `gridpack_base`), defaulting to `/cmsuf/data/store/user/<you>/mucoll/{samples,gridpacks}`.
+  `/blue` was nearly full (avery: ~105 T of 119 T) and one 4-sample full-chain production is
+  ~1.3 T, so productions live on `/cmsuf` (Lustre, hundreds of TB free). Override with
+  `MUCOLL_OUTPUT` (root) or `MUCOLL_GRIDPACKS` (grids only); `submit.py` passes the resolved
+  `GRIDPACK_BASE` into the container, so the shell side never duplicates the logic. The
+  sample dir is `samples/` (was `batch/`) — named for what it holds, like `gridpacks/`; a
+  `batch -> samples` symlink keeps older paths resolving. `gridpack_base()` only switches to
+  the new root once that directory exists, so grids never silently resolve to an empty dir.
 - **Rebuild `pythia/` on every image bump.** The standalone binaries (`LheToHepMC`,
   `MuMuToZH`) are linked with spack RPATHs, so a binary built against another image dies at
   GEN with `libpythia8.so: cannot open shared object file`. Everything else follows an image

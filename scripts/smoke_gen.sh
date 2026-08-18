@@ -7,7 +7,7 @@ SLURM_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 MUONCOLLIDER_DIR="$(dirname "$SLURM_DIR")"
 BENCH="$MUONCOLLIDER_DIR/mucoll-benchmarks"
 KEY=$1; NEVENTS=${2:-2}
-GRIDPACK_BASE="$MUONCOLLIDER_DIR/output/gridpacks"
+GRIDPACK_BASE="${GRIDPACK_BASE:-$MUONCOLLIDER_DIR/output/gridpacks}"
 
 read -r GEN_TYPE CARD_NAME GRIDPACK_NAME < <(
     awk -v k="$KEY" '!/^#/ && NF && $1==k {print $2,$3,$4; exit}' "$SLURM_DIR/samples.conf")

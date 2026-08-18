@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 import provlog
-from mucoll_paths import benchmarks_path, bind_flags, image_path
+from mucoll_paths import benchmarks_path, bind_flags, gridpack_base, image_path, samples_base
 
 SLURM_DIR = Path(__file__).resolve().parent
 MUONCOLLIDER_DIR = SLURM_DIR.parent
@@ -29,7 +29,7 @@ IMAGE = image_path()          # see lib/image.sh
 IMAGE_BINDS = bind_flags()
 BENCH = benchmarks_path()     # see mucoll_paths.py
 RUN_CHAIN = SLURM_DIR / "run_chain.sh"
-GRIDPACK_BASE = MUONCOLLIDER_DIR / "output" / "gridpacks"
+GRIDPACK_BASE = gridpack_base()   # see mucoll_paths.py
 
 
 def load_manifest():
@@ -75,8 +75,10 @@ def main():
                         "e.g. to rerun specific failed jobs; each keeps its original "
                         "seed and output dir job_<N>/")
     p.add_argument("-e", "--nevents", type=int, default=10, help="events per job")
-    p.add_argument("-o", "--output", default="output/batch",
-                   help="output dir relative to muoncollider/ (default: output/batch)")
+    p.add_argument("-o", "--output", default=None,
+                   help="output dir (absolute, or relative to muoncollider/). Default: "
+                        "<MUCOLL_OUTPUT>/samples, which resolves to /cmsuf/.../mucoll/samples "
+                        "on HPG — /blue has far less headroom. See mucoll_paths.py")
     p.add_argument("--pgun", nargs=4, metavar=("PDG", "PT", "TMIN", "TMAX"),
                    help="extra args for the pgun sample")
     p.add_argument("--tag", default=None,
@@ -123,7 +125,8 @@ def main():
     if not ok:
         sys.exit("Pre-flight failed; nothing submitted.")
 
-    output_base = (MUONCOLLIDER_DIR / args.output).resolve()
+    output_base = ((MUONCOLLIDER_DIR / args.output).resolve() if args.output
+                   else samples_base())
     log_dir = output_base / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     os.chmod(RUN_CHAIN, 0o755)
@@ -150,7 +153,8 @@ def main():
             # --cleanenv strips SLURM_* from the container, so re-inject SLURM_JOB_ID
             # explicitly — lib/stages.sh needs it to stage on per-job /scratch/local
             # (large node scratch) instead of the shared /tmp.
-            cmd = (f"apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID {tag_env}"
+            cmd = (f"apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID "
+                   f"--env GRIDPACK_BASE={GRIDPACK_BASE} {tag_env}"
                    f"{IMAGE_BINDS} --bind {MUONCOLLIDER_DIR} {IMAGE} "
                    f"bash {RUN_CHAIN} {key} {job_id} {args.nevents} {output_base} {BENCH}{extra}")
             slurm = f"""#!/bin/bash

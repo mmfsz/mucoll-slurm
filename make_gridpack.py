@@ -20,13 +20,13 @@ import subprocess
 import sys
 
 import provlog
-from mucoll_paths import benchmarks_path, bind_flags, image_path
+from mucoll_paths import benchmarks_path, bind_flags, gridpack_base, image_path
 
 # --- Configuration ---
 SLURM_DIR             = os.path.dirname(os.path.abspath(__file__))
 WORK_DIR              = os.path.dirname(SLURM_DIR)
 MUCOLL_BENCHMARKS_PATH = str(benchmarks_path())   # see mucoll_paths.py
-GRIDPACK_DIR          = os.path.join(WORK_DIR, "output/gridpacks")
+GRIDPACK_DIR          = str(gridpack_base())   # see mucoll_paths.py
 APPTAINER_IMAGE       = image_path()   # see lib/image.sh
 IMAGE_BINDS           = bind_flags()
 DATA_DIR_TO_BIND      = WORK_DIR
@@ -90,6 +90,14 @@ PROCESSES = {
         "workdir":  os.path.join(GRIDPACK_DIR, "mumu_lnuqq_Wmass_pt250_10TeV"),
     },
 }
+
+# This file is a script, not a library: everything below runs at import time and
+# submits SLURM jobs (24 h x 32 CPU each). Importing it — to inspect a constant,
+# say — would fire off the whole set, so refuse that outright.
+if __name__ != "__main__":
+    raise ImportError(
+        "make_gridpack.py is a script, not an importable module: importing it "
+        "would submit gridpack jobs. Import mucoll_paths for the paths instead.")
 
 parser = argparse.ArgumentParser(description="Submit Whizard gridpack integration jobs")
 parser.add_argument("processes", nargs="*", default=list(PROCESSES.keys()),
