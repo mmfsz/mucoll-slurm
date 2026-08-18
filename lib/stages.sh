@@ -56,14 +56,19 @@ stage_sim_digi_reco() {
         echo "ERROR: no digi_steer.py under $CONFIG — was setup_config.sh sourced?" >&2
         return 1; }
 
+    # -n is REQUIRED: v3.1's Common/steering.py declares
+    # build_application(..., evt_max=10) and digi_steer.py/reco_steer.py do not
+    # pass it, so without -n every job silently digitises/reconstructs only the
+    # FIRST 10 events of however many were simulated. (The old benchmarks set
+    # EvtMax = -1, so this never bit before v3.1.)
     t=$SECONDS; echo "--- Digitization ---"
-    k4run "$CONFIG/digi_steer.py" \
+    k4run "$CONFIG/digi_steer.py" -n "$NEVENTS" \
         --IOSvc.Input sim_output.edm4hep.root \
         --IOSvc.Output digi_output.edm4hep.root
     echo "Digitization took $((SECONDS - t))s"
 
     t=$SECONDS; echo "--- Reconstruction ---"
-    k4run "$CONFIG/reco_steer.py" \
+    k4run "$CONFIG/reco_steer.py" -n "$NEVENTS" \
         --IOSvc.Input digi_output.edm4hep.root \
         --IOSvc.Output reco_output.edm4hep.root
     echo "Reconstruction took $((SECONDS - t))s"
