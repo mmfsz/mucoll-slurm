@@ -194,6 +194,27 @@ path changed nothing here. What did change is where the configuration lives:
 Validated end-to-end on 1 pgun muon event (gen→sim→digi→reco, 510 s): 80 collections out,
 1 `SiTracks` / 1 `PandoraPFOs` / 1 `PandoraClusters` / 1 `JetOut`.
 
+#### ⚠️ Samples reconstructed BEFORE this migration have no particle flow
+
+The old `samf25` `k4MuC` checkout hands Pandora **no tracks** —
+`reconstruction/reco_components/pandora.py:94-95` is `TrackCollections = [],#"SiTracks"]` and
+`RelTrackCollections = []`, disabled upstream by commit `e47168a` (2025-09-16). With no track
+input Pandora cannot match a track to a cluster, so **every cluster becomes one neutral PFO**:
+`PandoraPFOs` is a 1:1 copy of `PandoraClusters` — same count, identical energies, PDG 22/2112
+only, **not one charged PFO**. `SiTracks` is still written to the file; Pandora just never sees
+it. The same steering also has `fastJet_cfg()` commented out, so there is no `JetOut`.
+
+v3.1 fixes both — `MAIAConfig/ParticleFlow/pandora.py:101` restores `TrackCollections =
+["SiTracks"]`, and `MAIAConfig/recoAlgList.py:56,58` enables `fastJet_cfg()`. That is exactly
+what the validation run above confirms: it produced `SiTracks`, `PandoraPFOs`, `PandoraClusters`
+**and** `JetOut`.
+
+Practical rule: **any sample reconstructed with the old `samf25` checkout — everything under
+`output/batch/` without a `_v3p1` suffix — is calorimeter-only.** Reco-level PFO studies on those samples measure calorimeter response, not
+particle flow, and must be re-reconstructed under v3.1 before they mean anything else. Measured
+in full (counts, energies, the residual direction-only difference) in
+`studies/jets_reconstruction/RESULTS.md`.
+
 ### Seed convention (the seed bug — KEEP FIXED)
 Cards use `seed  = 1234`. The gen plugins use `sed "s/seed *=.*/seed = $((1234 + JOB_ID))/"`
 (the `*` matters). The old one-space regex silently failed → every job ran seed 1234 →
