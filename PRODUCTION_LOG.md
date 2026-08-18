@@ -306,3 +306,41 @@ config-package move. The 300 vbf jobs already in flight were left to finish (the
 `/cmsuf/data/store/user/mmazza/mucoll/samples/`, while the three vbf samples of this
 production still land on `/blue` (they were submitted before the default changed) and are
 synced across afterwards.
+
+## 2026-08-18 11:47:16 — submit.py production
+- commit: `8bb0472a04a83e846412e957544de58959c06a6a` (clean)
+- params: `--indices [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82] -e 50 --tag v3p1 --qos avery-b`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `ZH_bbbb_lhe_v3p1`: 83 jobs (ids 39619753–39619835) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p1/`
+
+## 2026-08-18 — v3.1 DIGI/RECO silently truncated to 10 events (found + fixed mid-production)
+**The first finished job of this production had 10 events in digi/reco, not 50.** gen 50 →
+sim 50 → **digi 10** → reco 10. Cause, in the v3.1 config package:
+
+```
+configs/MAIAConfig/MAIAConfig/Common/steering.py:89
+def build_application(args, alg_list, input_files, output_file, histo_file, evt_max=10):
+```
+
+`digi_steer.py` and `reco_steer.py` call it without `evt_max`, so `ApplicationMgr` got
+`EvtMax = 10`. The pre-v3.1 benchmarks set `EvtMax = -1`; the 1-event pgun test that
+validated the v3.1 migration could not have caught it. **Fixed** in `lib/stages.sh` (commit
+`8bb0472`) by passing `-n "$NEVENTS"` to both `k4run` calls — verified by re-running digi
+over an existing 50-event sim file: 10 events before, 50 after.
+
+**How it surfaced** — worth remembering as a check: RECO ran *12× faster* than June (83 s vs
+~1030 s) and its output was *4.6× smaller* (105 MB vs 486 MB), the opposite of what the
+slower `FTFP_BERT_HP` list predicts. A stage getting cheaper when the physics got heavier is
+a red flag, not good news.
+
+**Effect on this production:**
+- `ZH_bbbb_lhe_v3p1` — 83 jobs had started pre-fix and were cancelled ~20 min in and
+  resubmitted by index (they had produced nothing; SIM alone is ~13 h). 17 jobs started
+  after the fix or were still pending, and were left alone. All 100 now run fixed code:
+  jobs read `run_chain.sh`/`lib/stages.sh` from the repo at start time, so a pending job
+  picks up a fix with no resubmission.
+- `vbf{Z,W,H}_*_v3p1` — 300 jobs were already running with the old code. Their **SIM output
+  is correct** (50 events); only digi/reco are truncated. Since SIM is ~1.9 h and digi+reco
+  are ~10 min, these are repaired in place with `scripts/redo_digireco.sh` rather than
+  regenerated. That script runs both stages in node scratch and only replaces the originals
+  after verifying the event count.
