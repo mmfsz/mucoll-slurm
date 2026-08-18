@@ -155,7 +155,7 @@ def main():
             # (large node scratch) instead of the shared /tmp.
             cmd = (f"apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID "
                    f"--env GRIDPACK_BASE={GRIDPACK_BASE} {tag_env}"
-                   f"{IMAGE_BINDS} --bind {MUONCOLLIDER_DIR} {IMAGE} "
+                   f"{IMAGE_BINDS} --bind {MUONCOLLIDER_DIR} --bind {output_base} {IMAGE} "
                    f"bash {RUN_CHAIN} {key} {job_id} {args.nevents} {output_base} {BENCH}{extra}")
             slurm = f"""#!/bin/bash
 #SBATCH --job-name=mucoll_{label}_{job_id}

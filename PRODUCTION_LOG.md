@@ -265,3 +265,9 @@ shared-`/tmp` ENOSPC that once corrupted SIM output is not a risk at this scale.
   - `vbfZ`: jobid 39617072 → `output/gridpacks/mumu_vbfZ_pt500_10TeV/`
   - `vbfW`: jobid 39617073 → `output/gridpacks/mumu_vbfW_pt500_10TeV/`
   - `vbfH`: jobid 39617074 → `output/gridpacks/mumu_vbfH_pt500_10TeV/`
+
+## 2026-08-18 11:20:59 — submit.py production
+- commit: `5a476c64dc47b0436a4be459d53775045d5095c1` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `ZH_bbbb_lhe_v3p1`: 100 jobs (ids 39618437–39618536) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p1/`
