@@ -26,8 +26,8 @@ source scripts/interact_hpg.sh     # grab a compute node (don't install on the l
 ./scripts/install_hpg.sh           # checks the CVMFS image + clones mucoll-benchmarks (v3.1, with submodules)
 ```
 
-Build the standalone Pythia8 binaries once (only needed for the `pythia_ZH` and `lhe`
-samples; rebuild only if the container image changes):
+Build the standalone Pythia8 binaries (needed by the `pythia_ZH` and all `*_lhe` samples).
+**You must do this again every time the container image changes** — see the next section.
 
 ```bash
 source scripts/shell_hpg.sh        # enter the container
@@ -35,6 +35,77 @@ source scripts/setup.sh            # load the spack environment
 bash pythia/build.sh               # compiles MuMuToZH + LheToHepMC into pythia/
 exit
 ```
+
+### 1.1 Rebuilding the Pythia binaries after an image change
+
+**Do this whenever the container image changes** — for example when `lib/image.sh` is
+pointed at a new release, when you set `MUCOLL_IMAGE` to a different image, or when the
+collaboration moves to a new software stack. It takes about a minute.
+
+**Why it's needed.** Everything else in this framework adapts to a new image on its own:
+`scripts/setup.sh` asks the image which software stack it carries, and `lib/env.sh`
+searches the image for the Whizard libraries. The `pythia/` programs are different,
+because they are *compiled* rather than interpreted. When you compile them, the compiler
+writes the full path of every library they need directly into the executable. Those paths
+contain a random-looking code (a "spack hash") that is unique to one image:
+
+```
+/opt/spack/opt/spack/.../pythia8-8.315-duneejqda5mtzdxezvirg2bskzdrqfoy/lib
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ changes with the image
+```
+
+A new image has different hashes, so those paths no longer exist and the program cannot
+start. The source code is fine — only the recorded paths are stale, and recompiling
+inside the new image records the new ones.
+
+**How you'll notice you forgot.** Jobs fail almost immediately, in the GEN stage. Look in
+the job's `.err` file (`output/batch/logs/<sample>_job_<N>.err`) for:
+
+```
+error while loading shared libraries: libpythia8.so: cannot open shared object file: No such file or directory
+```
+
+Only the samples that use these programs are affected — `ZH_bbbb_lhe`,
+`vbfH_bb_pt500_lhe`, `vbfZ_qq_pt500_lhe`, `vbfW_qq_pt500_lhe` and `pythia_ZH`. Whizard-only
+and `pgun` samples keep working, which can make the problem look sample-specific when it
+isn't.
+
+**The fix.** Get a compute node (don't compile on the login node), enter the *new* image,
+and rebuild:
+
+```bash
+source scripts/interact_hpg.sh     # grab a compute node
+source scripts/shell_hpg.sh        # enter the container (uses the image from lib/image.sh)
+source scripts/setup.sh            # load the spack environment
+bash pythia/build.sh               # recompiles MuMuToZH + LheToHepMC + probeZdecay
+exit
+```
+
+`build.sh` deletes the old executables first, so there's nothing to clean up by hand, and
+it finds Pythia8 and HepMC3 in the new image for you. A successful run ends with a line
+like `Build successful: 179K MuMuToZH`.
+
+**Check it worked** before submitting a few hundred jobs. `ldd` lists the libraries a
+program needs and flags any it cannot find, so an empty result is exactly what you want:
+
+```bash
+source scripts/shell_hpg.sh
+source lib/env.sh                  # sets the library paths up the way jobs do
+add_hepmc3_libs                    # adds HepMC3 (env.sh defines this; the gen step calls it)
+ldd pythia/LheToHepMC | grep "not found"    # prints NOTHING if the rebuild worked
+exit
+```
+
+If that prints lines like `libpythia8.so => not found`, the rebuild didn't take — you were
+probably in the old image, or `build.sh` reported an error you scrolled past.
+
+For a stronger check, generate a couple of events for one LHE sample with
+`scripts/smoke_gen.sh ZH_bbbb_lhe` (see section 5) — that exercises the same code path a
+real job uses.
+
+> The binaries are deliberately **not** stored in git (they're in `.gitignore`), because a
+> compiled file is only valid for the image it was built in. Cloning the repo fresh always
+> means building them once.
 
 ---
 

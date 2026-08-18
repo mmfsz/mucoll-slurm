@@ -200,3 +200,68 @@ brackets, never buggy): STILL VALID, NOT renamed, no regen needed.**
 - params: `-n 100 -e 50 --qos avery-b --after 36117414`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
 - production:
   - `ZH_bbbb_lhe`: 100 jobs (ids 36117482–36117581, afterok:36117414) → `output/batch/ZH_bbbb_lhe/`
+
+## 2026-08-18 09:35:31 — submit.py production
+- commit: `5c82a566fe27962343af6188c68bcda2b787e294` (clean)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `vbfZ_qq_pt500_lhe_v3p1`: 100 jobs (ids 39612869–39612983) → `output/batch/vbfZ_qq_pt500_lhe_v3p1/`
+  - `vbfW_qq_pt500_lhe_v3p1`: 100 jobs (ids 39612984–39613086) → `output/batch/vbfW_qq_pt500_lhe_v3p1/`
+  - `vbfH_bb_pt500_lhe_v3p1`: 100 jobs (ids 39613087–39613192) → `output/batch/vbfH_bb_pt500_lhe_v3p1/`
+
+## 2026-08-18 09:35:51 — submit.py production
+- commit: `5c82a566fe27962343af6188c68bcda2b787e294` (clean)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b`  (output base `/blue/avery/m.mazza/projects/muoncollider/output/batch`)
+- production:
+  - `ZH_bbbb_lhe_v3p1`: 100 jobs (ids 39613195–39613299) → `output/batch/ZH_bbbb_lhe_v3p1/`
+
+## 2026-08-18 — MAIA v3.1 pre-flight for the LHE production (bookkeeping, no jobs)
+**No jobs submitted here** — this records the checks made before the two `v3p1` submissions
+above, and two findings worth carrying forward.
+
+**Environment verified.** Image `mucoll-sim-ubuntu24:v3.1-amd64` (CVMFS, stack `2026-08-13`,
+Whizard 3.1.5, Pythia 8.315); `mucoll-benchmarks-v3.1` at `ce72cf0` with submodules identical
+to the tutorial's pinned checkout (`tutorial_aug2026/mucoll-benchmarks`). GEN was exercised
+through the real `gen/whizard_lhe.sh` path for all four LHE samples — all wrote HepMC.
+
+**Action required on every image bump: rebuild `pythia/`.** `LheToHepMC` (built 2026-06-15
+against the v3.0 stack) carries spack RPATHs to hashes that do not exist in v3.1 and dies with
+`libpythia8.so: cannot open shared object file`. Every LHE job would have failed at GEN.
+Fixed by rerunning `bash pythia/build.sh` inside the v3.1 container (clean build).
+
+**σ verification — v3.1 changes nothing in the matrix element.** Re-running the vbfW LHE card
+with only the pre-fix comma cut restored (`Pt > 5 [lTag, nuTag]`) under v3.1 reproduces the
+June value **exactly**: `5.2682077E+02 +- 3.42E-01 fb` (identical digits — same seed 1234,
+same integration spec, deterministic TAO RNG). So the −29 % between the June samples and the
+new ones (526.82 → 371.92 fb) is entirely the 2026-06-30 comma→colon cut fix, and is
+*intended*: vbfW's tag lepton comes from photon exchange, so its pT peaks near zero and a
+genuine per-particle 5 GeV cut bites hard. vbfZ/vbfH tag on W-exchange neutrinos and moved
+only +0.06 % / −0.5 %; ZH reuses its (post-fix) gridpack and is bit-identical.
+
+| sample | June (v3.0) | 2026-08 (v3.1) | Δ |
+|---|---|---|---|
+| `ZH_bbbb_lhe` | 0.12299007 fb | 0.12299007 fb | 0 (grid reused) |
+| `vbfZ_qq_pt500_lhe` | 223.68 ± 0.30 fb | 223.82 ± 0.30 fb | +0.06 % |
+| `vbfH_bb_pt500_lhe` | 20.337 ± 0.040 fb | 20.232 ± 0.039 fb | −0.5 % |
+| `vbfW_qq_pt500_lhe` | 526.82 ± 0.34 fb | 371.92 ± 0.22 fb | −29 % (cut fix, verified) |
+
+**Open: the three vbf gridpacks are stale.** The 2026-06-30 cut fix edited
+`cards/gridpack/mumu_vbf{Z,W,H}_pt500_10TeV.gridpack.sin`, but only `ZH_bbbb_lhe` was
+regenerated. VAMP therefore rejects the vbf grids (`parameter mismatch, discarding grid file`)
+and every vbf job re-integrates inline — correct physics and correct unweighting, but ~25–385 s
+of extra CPU per job and ~0.1–0.2 % σ scatter between jobs. To fix for future productions:
+`python make_gridpack.py vbfZ vbfW vbfH` (24 h / 32 CPU each), then submit with `--after`.
+
+**Note: job scratch falls back to `/tmp` on HPG.** `lib/stages.sh::setup_workdir` prefers
+`/scratch/local/$SLURM_JOB_ID`, but HiPerGator does not provision per-job local scratch
+(`GresTypes = gpu` only — there is no `scratch` GRES), so `mkdir` fails and every job warns
+into its `.err` and uses `/tmp`. That is benign here: `/tmp` on these nodes is a 1.7 TB
+node-local RAID (`/dev/md2`) at ~1 % use, with ≤10 of our jobs per node (~9 GB each), so the
+shared-`/tmp` ENOSPC that once corrupted SIM output is not a risk at this scale.
+
+## 2026-08-18 10:55:18 — make_gridpack.py
+- commit: `5c82a566fe27962343af6188c68bcda2b787e294` (DIRTY — SHA does NOT capture the exact code)
+- gridpacks:
+  - `vbfZ`: jobid 39617072 → `output/gridpacks/mumu_vbfZ_pt500_10TeV/`
+  - `vbfW`: jobid 39617073 → `output/gridpacks/mumu_vbfW_pt500_10TeV/`
+  - `vbfH`: jobid 39617074 → `output/gridpacks/mumu_vbfH_pt500_10TeV/`

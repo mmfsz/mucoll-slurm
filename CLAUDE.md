@@ -118,7 +118,7 @@ passes `--cleanenv`. Replaces the old `submit_jobs.py`, `submit_scan.py` (pgun),
 source scripts/interact_hpg.sh      # compute node
 ./scripts/install_hpg.sh            # check image + clone v3.1 benchmarks (one-time)
 
-# Build pythia binaries (one-time; rebuild only if the image changes)
+# Build pythia binaries (REQUIRED after every image bump — see Key Conventions)
 source scripts/shell_hpg.sh
 source scripts/setup.sh
 bash pythia/build.sh
@@ -141,12 +141,20 @@ squeue -u $USER
   automatically (v3.1 = `mucoll-stack-2026-08-13`). Whizard 3.1.5; geometry MAIA_v0.
 - Benchmarks: `MuonColliderSoft/mucoll-benchmarks`, cloned **with submodules** to
   `mucoll-benchmarks-v3.1/`. Override with `MUCOLL_BENCHMARKS`.
+- **Rebuild `pythia/` on every image bump.** The standalone binaries (`LheToHepMC`,
+  `MuMuToZH`) are linked with spack RPATHs, so a binary built against another image dies at
+  GEN with `libpythia8.so: cannot open shared object file`. Everything else follows an image
+  bump automatically; this does not. Run `bash pythia/build.sh` inside the new container.
 - Job scratch: `lib/stages.sh::setup_workdir` stages each job (~9 GB gen+sim+digi+reco) in
-  per-job node scratch `/scratch/local/$SLURM_JOB_ID` (large, isolated, auto-cleaned),
-  falling back to `/tmp` if unavailable. `submit.py` re-injects `SLURM_JOB_ID` via
-  `apptainer --env` (since `--cleanenv` strips it). This avoids `/blue` I/O contention AND
-  the shared-`/tmp` ENOSPC that was corrupting SIM ROOT output (`basket's WriteBuffer
-  failed` / missing `podio_metadata`).
+  per-job node scratch `/scratch/local/$SLURM_JOB_ID`, falling back to `/tmp`. **On HPG the
+  fallback is what actually runs**: the cluster provisions no per-job local scratch
+  (`GresTypes = gpu` — no `scratch` GRES), so `mkdir` fails and each job logs
+  `WARN: cannot create /scratch/local/...` to its `.err`. That is fine — `/tmp` on these
+  nodes *is* a large node-local disk (1.7 TB `/dev/md2`, ~1 % used), which is what the
+  staging wanted. It still avoids `/blue` I/O contention; the shared-`/tmp` ENOSPC that once
+  corrupted SIM ROOT output (`basket's WriteBuffer failed` / missing `podio_metadata`) is not
+  a risk at ~10 jobs/node. `submit.py` re-injects `SLURM_JOB_ID` via `apptainer --env` (since
+  `--cleanenv` strips it).
 
 ### MAIA v3.1 migration (2026-08-17)
 
