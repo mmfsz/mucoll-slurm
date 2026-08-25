@@ -9,3 +9,4 @@ __pycache__/
 pythia/MuMuToZH
 pythia/LheToHepMC
 pythia/probeZdecay
+.redo_*.sh

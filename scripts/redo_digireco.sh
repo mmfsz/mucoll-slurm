@@ -28,9 +28,20 @@ source "$SCRIPT_DIR/lib/env.sh"
 source "$BENCH/setup_config.sh" "$BENCH" "$GEO" >/dev/null
 CONFIG="$MUCOLL_CONFIG/$MUCOLL_CONFIG_NAME"
 
+# HPG creates /scratch/local/$SLURM_JOB_ID but leaves it root-owned and mode 700, so
+# testing -d passes while the job still cannot write there — and `mkdir -p` then reports
+# the *parent* it cannot search into, which under set -e killed this script. Test -w, and
+# keep a /tmp fallback for anything else (node /tmp here is a 1.7 T local disk).
 base=/tmp
-[ -n "${SLURM_JOB_ID:-}" ] && [ -d "/scratch/local/$SLURM_JOB_ID" ] && base="/scratch/local/$SLURM_JOB_ID"
-WORK="$base/redo_${idx}_$$"; mkdir -p "$WORK"; cd "$WORK"
+[ -n "${SLURM_TMPDIR:-}" ] && [ -w "${SLURM_TMPDIR:-}" ] && base="$SLURM_TMPDIR"
+[ -n "${SLURM_JOB_ID:-}" ] && [ -w "/scratch/local/$SLURM_JOB_ID" ] && base="/scratch/local/$SLURM_JOB_ID"
+WORK="$base/redo_${idx}_$$"
+if ! mkdir -p "$WORK" 2>/dev/null; then
+    echo "WARN: cannot create $WORK — falling back to /tmp" >&2
+    WORK="/tmp/redo_${idx}_$$"
+    mkdir -p "$WORK"
+fi
+cd "$WORK"
 trap 'cd /; rm -rf "$WORK"' EXIT
 
 echo "=== redo digi+reco: $JOB_DIR (job $idx, $NEVENTS events) ==="
