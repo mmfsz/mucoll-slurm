@@ -174,7 +174,8 @@ echo "Host: $(hostname)   Sample: {label}   Job: {job_id}"
             script.write_text(slurm)
             try:
                 if args.dry_run:
-                    print(f"  [dry-run] {label} job {job_id}")
+                    # Keep the script and name it: --dry-run exists to be inspected.
+                    print(f"  [dry-run] {label} job {job_id}: {script}")
                     continue
                 r = subprocess.run(["sbatch", str(script)], capture_output=True,
                                    text=True, check=True)
@@ -186,7 +187,9 @@ echo "Host: $(hostname)   Sample: {label}   Job: {job_id}"
                 print(f"  ERROR submitting {label} job {job_id}: {e.stderr.strip()}")
             finally:
                 # sbatch snapshots the script at submit time, so it's safe to remove now.
-                if script.exists():
+                # Under --dry-run we deliberately keep it — inspecting it is the point.
+                # These are .submit_*.sh, which .gitignore covers.
+                if script.exists() and not args.dry_run:
                     script.unlink()
 
     # Provenance log (skip on dry-run / if nothing was submitted).

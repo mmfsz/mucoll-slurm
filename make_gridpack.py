@@ -154,7 +154,10 @@ apptainer exec --cleanenv {IMAGE_BINDS} --bind {DATA_DIR_TO_BIND} {APPTAINER_IMA
 '
 """
 
-    script_path = f"chains/make_gridpack_{name}.sh"
+    # Absolute, and beside the script itself: a relative "chains/..." path made
+    # this silently depend on the caller's cwd (it only worked from mucoll-slurm/).
+    # Dot-prefixed and gitignored, same convention as submit.py's .submit_*.sh.
+    script_path = os.path.join(SLURM_DIR, f".gridpack_{name}.sh")
     with open(script_path, "w") as f:
         f.write(slurm_script)
 
@@ -168,7 +171,9 @@ apptainer exec --cleanenv {IMAGE_BINDS} --bind {DATA_DIR_TO_BIND} {APPTAINER_IMA
     except subprocess.CalledProcessError as e:
         print(f"Error submitting {name}: {e.stderr}")
     finally:
-        os.remove(script_path)
+        # sbatch snapshots the script at submit time, so removing it now is safe.
+        if os.path.exists(script_path):
+            os.remove(script_path)
 
 # Provenance log.
 if submitted:

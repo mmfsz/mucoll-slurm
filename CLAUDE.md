@@ -4,7 +4,10 @@
 
 Slurm batch framework for running the full muon collider simulation chain on **HiPerGator (HPG)**. Runs inside an Apptainer container with a Spack-managed software stack — by default the MAIA **v3.1** image unpacked on CVMFS, so there is no `.sif` to pull or keep in sync.
 
-**Repo**: `git@github.com:leblanc-lab/mucoll-slurm.git`
+**Repo**: `git@github.com:mmfsz/mucoll-slurm.git` (`origin`) — this **`maia-v3.1`** branch
+is where the v3.1 workflow lives; `leblanc-lab/mucoll-slurm` (`upstream`) has no such
+branch, so do not point anyone there for these instructions. Public over HTTPS, so a
+new user needs no SSH key: `git clone -b maia-v3.1 https://github.com/mmfsz/mucoll-slurm.git`
 
 ## Architecture (manifest-driven, 2026-06)
 
