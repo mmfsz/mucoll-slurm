@@ -56,11 +56,12 @@ stage_sim_digi_reco() {
         echo "ERROR: no digi_steer.py under $CONFIG — was setup_config.sh sourced?" >&2
         return 1; }
 
-    # -n is REQUIRED: v3.1's Common/steering.py declares
-    # build_application(..., evt_max=10) and digi_steer.py/reco_steer.py do not
-    # pass it, so without -n every job silently digitises/reconstructs only the
-    # FIRST 10 events of however many were simulated. (The old benchmarks set
-    # EvtMax = -1, so this never bit before v3.1.)
+    # -n is REQUIRED: Common/steering.py declares build_application(..., evt_max=10)
+    # and digi_steer.py/reco_steer.py do not pass it, so without -n every job
+    # silently digitises/reconstructs only the FIRST 10 events of however many were
+    # simulated. Not a v3.1 regression: upstream has always had EvtMax = 10. It never
+    # bit before only because our samf25 checkout carries a local uncommitted edit to
+    # EvtMax = -1, which the clean v3.1 checkout does not inherit.
     t=$SECONDS; echo "--- Digitization ---"
     k4run "$CONFIG/digi_steer.py" -n "$NEVENTS" \
         --IOSvc.Input sim_output.edm4hep.root \

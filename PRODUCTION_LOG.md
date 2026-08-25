@@ -323,8 +323,12 @@ def build_application(args, alg_list, input_files, output_file, histo_file, evt_
 ```
 
 `digi_steer.py` and `reco_steer.py` call it without `evt_max`, so `ApplicationMgr` got
-`EvtMax = 10`. The pre-v3.1 benchmarks set `EvtMax = -1`; the 1-event pgun test that
-validated the v3.1 migration could not have caught it. **Fixed** in `lib/stages.sh` (commit
+`EvtMax = 10`. The 1-event pgun test that validated the v3.1 migration could not have
+caught it. (Corrected 2026-08-18: this entry first said "the pre-v3.1 benchmarks set
+`EvtMax = -1`, so this is new". That is wrong — upstream `mucoll-benchmarks` has had
+`EvtMax = 10` throughout its k4run history. It never bit before because our `samf25`
+checkout carries a local *uncommitted* edit to `-1`, dated 2026-03-09, which the clean
+v3.1 checkout does not inherit.) **Fixed** in `lib/stages.sh` (commit
 `8bb0472`) by passing `-n "$NEVENTS"` to both `k4run` calls — verified by re-running digi
 over an existing 50-event sim file: 10 events before, 50 after.
 

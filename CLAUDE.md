@@ -142,14 +142,21 @@ squeue -u $USER
   automatically (v3.1 = `mucoll-stack-2026-08-13`). Whizard 3.1.5; geometry MAIA_v0.
 - Benchmarks: `MuonColliderSoft/mucoll-benchmarks`, cloned **with submodules** to
   `mucoll-benchmarks-v3.1/`. Override with `MUCOLL_BENCHMARKS`.
-- **DIGI/RECO need `-n $NEVENTS`** (v3.1). The config package's
-  `Common/steering.py` declares `build_application(..., evt_max=10)` and neither
-  `digi_steer.py` nor `reco_steer.py` passes it, so without `-n` every job digitises and
-  reconstructs only the **first 10 events** of however many it simulated — at full SIM cost,
-  silently. The pre-v3.1 benchmarks set `EvtMax = -1`, so this is new, and a 1-event pgun
-  test cannot reveal it. `lib/stages.sh` passes `-n` to both. Symptom if it regresses: RECO
-  gets *faster* and its output smaller when the physics got heavier. Repair without redoing
-  SIM: `scripts/redo_digireco.sh <job_dir> <nevents>`.
+- **DIGI/RECO need `-n $NEVENTS`**. The config package's `Common/steering.py:89` declares
+  `build_application(..., evt_max=10)` and neither `digi_steer.py` nor `reco_steer.py` passes
+  it, so without `-n` every job digitises and reconstructs only the **first 10 events** of
+  however many it simulated — at full SIM cost, silently. `k4run`'s `-n/--num-events` is the
+  only override (it sets `ApplicationMgr().EvtMax` *after* the steering file executes); there
+  is no steering-level argument for it, in MAIAConfig or anywhere else.
+  **This is not a v3.1 regression.** Upstream `MuonColliderSoft/mucoll-benchmarks` has had
+  `EvtMax = 10` at every point of its k4run history (back to `2436589`, 2025-11-20, Samuel
+  Ferraro), and MAIAConfig has never shipped `-1`. Pre-v3.1 productions here escaped it only
+  because the `samf25` checkout in `mucoll-benchmarks/` carries a local **uncommitted** edit
+  to `EvtMax = -1` in `digitization/digi_steer.py` and `reconstruction/reco_steer.py` (mtime
+  2026-03-09) — a patch the clean v3.1 checkout does not inherit. Do not cite that `-1` as
+  upstream behaviour. A 1-event pgun test cannot reveal any of this. `lib/stages.sh` passes
+  `-n` to both. Symptom if it regresses: RECO gets *faster* and its output smaller when the
+  physics got heavier. Repair without redoing SIM: `scripts/redo_digireco.sh <job_dir> <nevents>`.
 - Output location: resolved **only** in `mucoll_paths.py` (`output_base` / `samples_base` /
   `gridpack_base`), defaulting to `/cmsuf/data/store/user/<you>/mucoll/{samples,gridpacks}`.
   `/blue` was nearly full (avery: ~105 T of 119 T) and one 4-sample full-chain production is
