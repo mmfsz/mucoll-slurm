@@ -596,8 +596,33 @@ for name in sorted(ev.getAvailableCollections()): print(name)"
 ```
 
 A v3.1 reconstructed file should contain `SiTracks`, `PandoraClusters`, `PandoraPFOs` and
-jets. Note that this production **swaps the `JetOut` and `UsedPFOs` collection names** —
-the jets are in `UsedPFOs`.
+jets.
+
+> ### ⚠️ In the current image the jets are in `UsedPFOs`, not `JetOut`
+>
+> `FastJetAlg` returned its two output collections in the wrong order, so the contents of
+> `jetOut` and `recParticleOut` are swapped: **`UsedPFOs` holds the jets, and `JetOut`
+> holds the PFOs that went into them.** The MAIAConfig steering is not at fault — its
+> names are correct; the bug was in k4Reco's C++.
+>
+> It is **fixed upstream** (`MuonColliderSoft/k4Reco` commit `2305fbf`, merged as PR #19
+> on 2026-08-20), but the fix is not in any tagged release yet — `v0.3` predates it, and
+> the v3.1 image ships exactly `k4reco-0.3`. So the swap is live for every sample produced
+> with this image, and **will invert the moment the image picks up a k4reco newer than
+> `v0.3`**. Analysis code that hardcodes `UsedPFOs` as "the jets" will then silently read
+> the wrong collection.
+>
+> Rather than hardcoding either name, check which convention a file follows. The jets are
+> the collection whose entries are *not* a subset of `PandoraPFOs` — with one jet, that is
+> the collection holding a single object whose energy is the sum of the others:
+> ```bash
+> python3 -c "
+> from podio.reading import get_reader
+> ev = get_reader('reco_output.edm4hep.root').get('events')[0]
+> for c in ('PandoraPFOs', 'JetOut', 'UsedPFOs'):
+>     col = ev.get(c)
+>     print(f'{c:12s} n={len(col):3d}  E={sum(p.getEnergy() for p in col):.3f}')"
+> ```
 
 ### 7.5 Testing only the generator
 
