@@ -42,7 +42,8 @@ BENCHMARKS_PATH="${MUCOLL_BENCHMARKS:-$MUONCOLLIDER_DIR/mucoll-benchmarks-v3.1}"
 #      whole pgun sample dies at GEN on any checkout at or after it.
 # ce72cf0 (2026-08-15, "bumped MAIA config") is the revision every production in
 # PRODUCTION_LOG.md was generated against. Bump it deliberately, not by accident.
-BENCHMARKS_REF="${MUCOLL_BENCHMARKS_REF:-ce72cf07c513bf845d78635236367fc561e98f70}"
+BENCHMARKS_REF_DEFAULT=ce72cf07c513bf845d78635236367fc561e98f70
+BENCHMARKS_REF="${MUCOLL_BENCHMARKS_REF:-$BENCHMARKS_REF_DEFAULT}"
 
 if [ -d "$BENCHMARKS_PATH" ]; then
     echo "mucoll-benchmarks already exists at $BENCHMARKS_PATH, skipping clone."
@@ -77,7 +78,9 @@ if [ -f "$PGUN" ] && ! python3 -c "import ast,sys; ast.parse(open(sys.argv[1]).r
     echo "ERROR: $PGUN does not parse as Python." >&2
     echo "       You are on a benchmarks revision with a known upstream breakage." >&2
     echo "       Use the pinned revision:" >&2
-    echo "         git -C $BENCHMARKS_PATH checkout $BENCHMARKS_REF" >&2
+    # Name the known-good default, NOT $BENCHMARKS_REF — under MUCOLL_BENCHMARKS_REF
+    # that is the very revision that just failed to parse.
+    echo "         git -C $BENCHMARKS_PATH checkout $BENCHMARKS_REF_DEFAULT" >&2
     echo "         git -C $BENCHMARKS_PATH submodule update --init --recursive" >&2
     exit 1
 fi

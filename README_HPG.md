@@ -43,8 +43,10 @@ ls -d /cvmfs/unpacked.cern.ch/ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.1-
 python3 --version && apptainer --version
 
 # 4. You have somewhere with space for the output.
-ls -d /cmsuf/data/store/user/$(echo $USER | tr -d .)
-#    -> if this does NOT exist, read the warning in section 5 BEFORE your first
+ls -d /cmsuf/data/store/user/$USER /cmsuf/data/store/user/$(echo $USER | tr -d .) 2>/dev/null
+#    -> either one appearing is fine; the code tries both spellings, because an
+#       HPG username like m.mazza maps to a /cmsuf directory named mmazza.
+#    -> if NEITHER exists, read the warning in section 5 BEFORE your first
 #       production. Test jobs are fine without it.
 ```
 
@@ -117,7 +119,7 @@ This does two things:
   submodules are essential: v3.1 keeps the digitization and reconstruction steering in a
   per-geometry submodule (`configs/MAIAConfig/`), and nothing works without it.
 
-It takes about 15 seconds and ends with `=== Setup complete ===` and a summary of the
+It takes well under a minute and ends with `=== Setup complete ===` and a summary of the
 layout.
 
 > **Why the benchmarks revision is pinned.** Two reasons. First, reproducibility: if
@@ -147,7 +149,7 @@ exit                               # leave the container
 
 A successful build ends with a line like `Build successful: 179K MuMuToZH`.
 
-> **You must repeat this whenever the container image changes** — see section 9.1 for why
+> **You must repeat this whenever the container image changes** — see section 9 for why
 > and how to tell.
 
 You are now installed. Section 2 checks it actually works.
@@ -174,7 +176,7 @@ apptainer exec --cleanenv --bind /cvmfs --bind "$MUON" \
 Reading that command: `run_chain.sh <SAMPLE_KEY> <JOB_ID> <NEVENTS> <OUTPUT_DIR> <BENCHMARKS>`.
 So this is sample `pgun`, job number `0`, **1** event.
 
-It takes roughly 8-10 minutes and prints each stage as it goes (`--- Generation ---`,
+It takes roughly 5-10 minutes and prints each stage as it goes (`--- Generation ---`,
 `--- Simulation ---`, `--- Digitization ---`, `--- Reconstruction ---`). When it finishes:
 
 ```bash
@@ -466,7 +468,10 @@ Notes on why each step is what it is:
   and `run_chain.sh`.)
 - **`lib/env.sh`, not `scripts/setup.sh`.** `lib/env.sh` loads the spack software stack
   (by sourcing `scripts/setup.sh` for you) *and* adds the Whizard libraries. Sourcing only
-  `setup.sh` is enough for `ddsim`/`k4run` but leaves Whizard unable to start.
+  `setup.sh` is enough for `ddsim`/`k4run`, and `whizard` will even start — but it then
+  integrates, compiles its process library, and *only then* aborts with
+  `*** FATAL ERROR: libomega.so.0: cannot open shared object file`. Because that comes
+  after pages of healthy-looking output, it is easy to misread as a problem with your card.
 - **`--cleanenv`** is used when entering the container (`shell_hpg.sh` does it for you).
   Without it, the host's `module load python` leaks `PYTHONHOME` into the container and
   breaks its Python with `No module named 'encodings'`.
@@ -482,7 +487,8 @@ The simplest way to run everything by hand is the same dispatcher batch jobs use
 bash run_chain.sh <SAMPLE_KEY> <JOB_ID> <NEVENTS> <OUTPUT_DIR> <BENCHMARKS_PATH> [extra…]
 
 # e.g. 5 events of the ZH -> bbbb sample into a scratch directory:
-bash run_chain.sh ZH_bbbb_pythia 0 5 /blue/avery/$USER/test_out ../mucoll-benchmarks-v3.1
+MUON=/blue/avery/$USER/muoncollider
+bash run_chain.sh ZH_bbbb_pythia 0 5 /blue/avery/$USER/test_out "$MUON/mucoll-benchmarks-v3.1"
 ```
 
 It does everything: creates a scratch working directory, runs GEN/SIM/DIGI/RECO, moves the
@@ -493,10 +499,14 @@ sets the random seed (`seed = 1234 + JOB_ID`), so two runs with the same `JOB_ID
 For `pgun`, the `[extra…]` arguments are `PDG PT THETA_MIN THETA_MAX`:
 
 ```bash
-bash run_chain.sh pgun 0 10 /blue/avery/$USER/test_out ../mucoll-benchmarks-v3.1 13 100 10 170
+bash run_chain.sh pgun 0 10 /blue/avery/$USER/test_out "$MUON/mucoll-benchmarks-v3.1" 13 100 10 170
 ```
 
 ### 7.3 One stage at a time
+
+**Do section 7.1 first, in this same shell** — these commands need `lib/env.sh` on the
+environment and `$MUCOLL_CONFIG` set by `setup_config.sh`. (If `$MUCOLL_CONFIG` is empty you
+will see errors about `//digi_steer.py`.)
 
 When you want to stop and look between stages, run them individually. Work in a scratch
 directory, because these commands write into the current directory:
@@ -588,7 +598,8 @@ the jets are in `UsedPFOs`.
 ### 7.5 Testing only the generator
 
 Simulation costs minutes per event; generation costs seconds. So when you are working on a
-*card*, run only the GEN step from section 7.3 and stop there — do not run `ddsim`:
+*card*, run only the GEN step from section 7.3 and stop there — do not run `ddsim`. Section
+7.1 must have been done in this shell (Whizard needs `lib/env.sh`):
 
 ```bash
 cp "$SLURM_DIR/cards/production/<your_card>.sin" job.sin
@@ -702,7 +713,8 @@ For a stronger check, run two events of an LHE sample through the real dispatche
 exercises the same code path a job does:
 
 ```bash
-bash run_chain.sh ZH_bbbb_lhe 0 2 /blue/avery/$USER/test_out ../mucoll-benchmarks-v3.1
+MUON=/blue/avery/$USER/muoncollider
+bash run_chain.sh ZH_bbbb_lhe 0 2 /blue/avery/$USER/test_out "$MUON/mucoll-benchmarks-v3.1"
 ```
 
 > The binaries are deliberately **not** stored in git (they are in `.gitignore`), because a
@@ -718,11 +730,11 @@ bash run_chain.sh ZH_bbbb_lhe 0 2 /blue/avery/$USER/test_out ../mucoll-benchmark
 | `git clone` asks for a password / `Permission denied (publickey)` | no SSH key registered with GitHub | use the HTTPS clone URL (section 1.1), or add an SSH key |
 | Nothing in this guide matches the files you have | you are on the `main` branch | `git checkout maia-v3.1` |
 | `install_hpg.sh`: `container image not found` | `/cvmfs` not mounted on this node | try another compute node, or pull a local `.sif` as the message explains |
-| `setup_config.sh: No such file` | benchmarks cloned without submodules | `git -C ../mucoll-benchmarks-v3.1 submodule update --init --recursive` |
-| `python: command not found` | HPG has no bare `python` command | use `python3` (3.9+ is always present; no module load needed) |
+| `setup_config.sh` prints `Config package not found`, and `$MUCOLL_CONFIG` is then empty (so later commands complain about `//digi_steer.py`) | benchmarks cloned without submodules | `git -C ../mucoll-benchmarks-v3.1 submodule update --init --recursive` |
+| `python: command not found` | HPG has no bare `python` command | use `python3` (3.9+ is always present; no module load needed). Note this applies to the **host** only — inside the container `python` does exist, which is why section 7.3 uses it |
 | `No module named 'encodings'` inside the container | host `PYTHONHOME` leaked in | enter with `--cleanenv` (i.e. use `scripts/shell_hpg.sh`) |
-| `libpythia8.so: cannot open shared object file` | image changed, binaries stale | rebuild — section 9.1 |
-| `whizard: command not found` | you sourced `scripts/setup.sh` but not `lib/env.sh` | `source lib/env.sh` |
+| `libpythia8.so: cannot open shared object file` | image changed, binaries stale | rebuild — section 9 |
+| Whizard aborts with `*** FATAL ERROR: libomega.so.0: cannot open shared object file`, *after* it compiled the process library | you sourced `scripts/setup.sh` but not `lib/env.sh` | `source lib/env.sh` |
 | RECO output has exactly 10 events | `-n` missing on the DIGI/RECO commands | section 7.3 — batch jobs already pass it for you |
 | RECO got *faster* and its output *smaller* when the physics got heavier | the same 10-event truncation | as above |
 | Every job produced identical events | seed not actually substituted | check `seed = 1234 + JOB_ID` really changed in `job.sin` |
@@ -764,6 +776,7 @@ documented in `CLAUDE.md` rather than here.
 |----------|--------|
 | `MUCOLL_IMAGE` | use a different container image (default in `lib/image.sh`) |
 | `MUCOLL_BENCHMARKS` | use a different benchmarks checkout |
+| `MUCOLL_BENCHMARKS_REF` | the benchmarks revision `install_hpg.sh` pins (default `ce72cf0`) |
 | `MUCOLL_OUTPUT` | change the output root (`samples/` + `gridpacks/`) |
 | `MUCOLL_GRIDPACKS` | change only where gridpacks are read/written |
 | `MUCOLL_GEOMETRY` | detector geometry (default `MAIA_v0`) |

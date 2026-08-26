@@ -30,6 +30,20 @@ GEO="${MUCOLL_GEOMETRY:-MAIA_v0}"
 
 [ -f "$MANIFEST" ] || { echo "ERROR: manifest not found: $MANIFEST" >&2; exit 1; }
 
+# Absolutise every caller-supplied path BEFORE setup_workdir cd's into node scratch.
+# Otherwise a relative argument silently re-resolves against the scratch dir: a relative
+# BENCH dies at GEN with a confusing "can't open .../tmp/mucoll_job_*/../mucoll-benchmarks-v3.1/..."
+# and a relative OUTPUT_DIR is worse — move_outputs would write the results *inside* the
+# scratch dir, which cleanup_workdir then deletes.
+[ -d "$BENCH" ] || { echo "ERROR: benchmarks path not found: $BENCH" >&2; exit 1; }
+BENCH="$(cd "$BENCH" && pwd)"
+mkdir -p "$OUTPUT_DIR" || { echo "ERROR: cannot create output dir: $OUTPUT_DIR" >&2; exit 1; }
+OUTPUT_DIR="$(cd "$OUTPUT_DIR" && pwd)"
+case "$GRIDPACK_BASE" in
+    /*) ;;
+    *) GRIDPACK_BASE="$(cd "$GRIDPACK_BASE" 2>/dev/null && pwd || echo "$GRIDPACK_BASE")" ;;
+esac
+
 # Look up the manifest row (whitespace-delimited; '#' comments, blanks ignored).
 read -r GEN_TYPE CARD_NAME GRIDPACK_NAME < <(
     awk -v k="$SAMPLE_KEY" '!/^#/ && NF && $1==k {print $2, $3, $4; exit}' "$MANIFEST")
