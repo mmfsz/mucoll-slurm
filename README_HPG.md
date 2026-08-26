@@ -394,8 +394,12 @@ python3 make_gridpack.py vbfZ        # -> "Submitted vbfZ gridpack job: Submitte
 ```
 
 Available process names: `vbfH vbfZ vbfW bbbb nunuqq mumuqq ZH_bbbb_whizard ZH_bbbb_lhe
-nunubb_Hmass_pt250 nunuqq_Zmass_pt250 lnuqq_Wmass_pt250`. With no argument it submits all
-of them.
+nunubb_Hmass_pt250 nunuqq_Zmass_pt250 lnuqq_Wmass_pt250`. Name the ones you want,
+space-separated (`python3 make_gridpack.py vbfZ vbfW`).
+
+> There is deliberately **no "submit everything" default** — running it with no argument
+> prints the list and exits. Each process is its own 24-hour, 32-CPU job, so a bare
+> invocation would have queued all eleven at once.
 
 **Step 2 — wait, then confirm the grids exist:**
 

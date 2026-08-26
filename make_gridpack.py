@@ -99,10 +99,29 @@ if __name__ != "__main__":
         "make_gridpack.py is a script, not an importable module: importing it "
         "would submit gridpack jobs. Import mucoll_paths for the paths instead.")
 
-parser = argparse.ArgumentParser(description="Submit Whizard gridpack integration jobs")
-parser.add_argument("processes", nargs="*", default=list(PROCESSES.keys()),
-                    help=f"Processes to submit (default: all). Choices: {list(PROCESSES.keys())}")
+parser = argparse.ArgumentParser(
+    description="Submit Whizard gridpack integration jobs",
+    epilog="Name each process explicitly, space-separated: "
+           "make_gridpack.py vbfZ vbfW")
+parser.add_argument("processes", nargs="*", metavar="PROCESS",
+                    help=f"Processes to submit, space-separated. "
+                         f"Choices: {' '.join(PROCESSES)}")
 args = parser.parse_args()
+
+# No "submit everything" default, deliberately. Each process is its own 24 h x 32 CPU
+# SLURM job, so a bare `make_gridpack.py` used to fire off all of them at once — an
+# expensive thing to do by accident, and easy to do while exploring the command.
+if not args.processes:
+    print("ERROR: name at least one process to submit.\n", file=sys.stderr)
+    print(f"  Available ({len(PROCESSES)}): {' '.join(PROCESSES)}", file=sys.stderr)
+    print("  Example:  python3 make_gridpack.py vbfZ", file=sys.stderr)
+    print("            python3 make_gridpack.py vbfZ vbfW      # space-separated",
+          file=sys.stderr)
+    print(f"\nThere is no 'all' default on purpose: each process is a separate "
+          f"24 h x 32 CPU\njob, so a bare invocation would submit all {len(PROCESSES)} "
+          f"of them. If that is genuinely\nwhat you want, list them explicitly.",
+          file=sys.stderr)
+    sys.exit(2)
 
 # Validate process names
 for p in args.processes:
