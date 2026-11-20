@@ -20,7 +20,7 @@ IMAGE_SH = SLURM_DIR / "lib" / "image.sh"
 # compatible with the old samf25 k4MuC checkout, so it lives alongside it rather
 # than replacing it — main and this branch can both run. scripts/install_hpg.sh
 # creates it.
-DEFAULT_BENCHMARKS = SLURM_DIR.parent / "mucoll-benchmarks-v3.1"
+DEFAULT_BENCHMARKS = SLURM_DIR.parent / "mucoll-benchmarks-v3.2"
 
 _DEFAULT_RE = re.compile(r'^export\s+MUCOLL_IMAGE="\$\{MUCOLL_IMAGE:-(?P<path>[^}]*)\}"', re.M)
 

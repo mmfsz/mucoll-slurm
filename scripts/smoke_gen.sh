@@ -8,7 +8,7 @@ MUONCOLLIDER_DIR="$(dirname "$SLURM_DIR")"
 # v3.1 layout, same resolution as run_chain.sh/redo_digireco.sh. The old
 # pre-v3.1 path was hardcoded here, so `smoke_gen.sh pgun` looked for the
 # particle gun in a checkout this branch does not use.
-BENCH="${MUCOLL_BENCHMARKS:-$MUONCOLLIDER_DIR/mucoll-benchmarks-v3.1}"
+BENCH="${MUCOLL_BENCHMARKS:-$MUONCOLLIDER_DIR/mucoll-benchmarks-v3.2}"
 KEY=$1; NEVENTS=${2:-2}
 GRIDPACK_BASE="${GRIDPACK_BASE:-$MUONCOLLIDER_DIR/output/gridpacks}"
 

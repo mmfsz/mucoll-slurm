@@ -2,7 +2,7 @@
 
 ## Overview
 
-Slurm batch framework for running the full muon collider simulation chain on **HiPerGator (HPG)**. Runs inside an Apptainer container with a Spack-managed software stack — by default the MAIA **v3.1** image unpacked on CVMFS, so there is no `.sif` to pull or keep in sync.
+Slurm batch framework for running the full muon collider simulation chain on **HiPerGator (HPG)**. Runs inside an Apptainer container with a Spack-managed software stack — by default the MAIA **v3.2** image unpacked on CVMFS, so there is no `.sif` to pull or keep in sync. (Branch `v3.2_bib`; see the v3.2 migration note below. `maia-v3.1` keeps the v3.1 workflow.)
 
 **Repo**: `git@github.com:mmfsz/mucoll-slurm.git` (`origin`) — this **`maia-v3.1`** branch
 is where the v3.1 workflow lives; `leblanc-lab/mucoll-slurm` (`upstream`) has no such
@@ -139,12 +139,13 @@ squeue -u $USER
 - spack + Whizard paths live **only** in `scripts/setup.sh` + `lib/env.sh`, and both now
   *discover* their targets rather than hardcode a spack hash — an image bump needs no edit.
 - Container image: named **only** in `lib/image.sh`, default
-  `/cvmfs/unpacked.cern.ch/ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.1-amd64`.
+  `/cvmfs/unpacked.cern.ch/ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.2-amd64`.
   Override with `MUCOLL_IMAGE=/path/to/mucoll-sim.sif` — no code edit needed.
 - Spack stack: loaded via the image's own `/opt/setup_mucoll.sh`, so it follows the image
-  automatically (v3.1 = `mucoll-stack-2026-08-13`). Whizard 3.1.5; geometry MAIA_v0.
+  automatically (v3.2 = `mucoll-stack-3.2`). Whizard 3.1.7; geometry MAIA_v0.
 - Benchmarks: `MuonColliderSoft/mucoll-benchmarks`, cloned **with submodules** to
-  `mucoll-benchmarks-v3.1/`. Override with `MUCOLL_BENCHMARKS`.
+  `mucoll-benchmarks-v3.2/` at tag `v3.2` (`f1d1cdd`, MAIAConfig `8831727`). Override with
+  `MUCOLL_BENCHMARKS`.
 - **DIGI/RECO need `-n $NEVENTS`**. The config package's `Common/steering.py:89` declares
   `build_application(..., evt_max=10)` and neither `digi_steer.py` nor `reco_steer.py` passes
   it, so without `-n` every job digitises and reconstructs only the **first 10 events** of
@@ -183,6 +184,54 @@ squeue -u $USER
   corrupted SIM ROOT output (`basket's WriteBuffer failed` / missing `podio_metadata`) is not
   a risk at ~10 jobs/node. `submit.py` re-injects `SLURM_JOB_ID` via `apptainer --env` (since
   `--cleanenv` strips it).
+
+### MAIA v3.2 migration (2026-11-20)
+
+The reason to move was a v3.1 bug in the BIB overlay. When background lands on an
+already-hit calorimeter cell, the hit energy was not updated
+([k4FWCore#443](https://github.com/key4hep/k4FWCore/issues/443)). The fix is
+EDM4hep#534 (EDM4hep 1.3) plus k4FWCore#447, both in v3.2 (k4FWCore `main@086f292`).
+
+Other changes in v3.2:
+- **JetOut/UsedPFOs swap is gone.** v3.2 uses key4hep `k4Reco@c0a8ef1`, where `JetOut`
+  holds the jets and `UsedPFOs` is the constituent subset. v3.1 files are still swapped,
+  so analysis code must branch on the release.
+- **`evt_max` defaults to -1** in MAIAConfig `8831727`. Keep passing `-n`; it is harmless.
+- **The overlay is k4FWCore `OverlayTiming`** with `RandomMixBackgroundFiles=True`
+  (`Overlay/overlay.py`). The directories are globbed in the options. The random draw is
+  seeded by (`--RandSeed`, event number, run number).
+- **Calorimeter truth-coning is opt-in** (`--doCaloConing`, 0.6 rad). v3.1 always applied
+  it, so Pandora now sees every selected hit by default.
+- **LCContent 3.2.0 → 5.1.1.** v3.1 jet/PFO results are not a v3.2 baseline. On 2 vbfZ
+  events, event 0 had PFOs carrying 1358 GeV out of 2993 GeV of clusters, whereas v3.1
+  had 3090 = 3090. This is not understood yet.
+- **k4geo 00-26 → 00-27.** In MAIA_v0 the beampipe and nozzle were re-parametrised near
+  the nozzle joint, the field moved to its own file, and a material composition was
+  fixed. Sensitive detectors and readouts are unchanged, so v3.1 SIM digitises cleanly
+  under v3.2.
+- **Whizard 3.1.5 → 3.1.7.** Gridpacks integrated under v3.1 are untested with it, so
+  regenerate or validate before new GEN.
+- `pythia/` was rebuilt in v3.2. Its binaries are not interchangeable with the v3.1 tree.
+
+The worktree is `../mucoll-slurm-v3.2`, kept separate so that v3.1 jobs queued from
+`mucoll-slurm/` keep reading v3.1 scripts and binaries. Merge once they drain.
+
+### BIB overlay (v3.2)
+
+- **Library:** `/blue/avery/share/mucol/bib/BIB_v9/{sim_mp,sim_mm}`, 6663 + 6662 files,
+  99 GB per beam. Its origin is recorded in `README.md` there. Override with `MUCOLL_BIB`.
+- **`--OverlayFullNumberBackground N` is per beam.** 1666 = 100 % of a bunch crossing.
+- **Tools:** `scripts/submit_bib.py` → `scripts/bib_digireco.sh`. DIGI+RECO reuses the
+  existing `_v3p1` SIM: event i = entry i%50 of sim job i//50.
+  - Output goes to `<samples>/<KEY>_v3p2_bib<N>[_cc][_tc]/`.
+  - `--bib 0` makes the no-BIB twin of the same events.
+  - `scripts/bib_bench_summary.py` turns the worker logs into a cost table.
+- **Pitfalls:**
+  - Use a unique `--RandSeed` per job; `submit_bib.py` hashes it from the sample, sim job
+    and entry.
+  - Pass `--doOverlayFull` to RECO too. Its only effect there is to drop the hit
+    collections (>1 GB/event with BIB).
+  - The Yoke is not overlaid.
 
 ### MAIA v3.1 migration (2026-08-17)
 

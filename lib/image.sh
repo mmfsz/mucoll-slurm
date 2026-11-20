@@ -8,10 +8,10 @@
 # Override per invocation without editing anything:
 #   MUCOLL_IMAGE=/path/to/mucoll-sim.sif ./scripts/shell_hpg.sh
 #
-# The default is the v3.1 release unpacked on CVMFS: nothing to pull, no 9 GB
+# The default is the v3.2 release unpacked on CVMFS: nothing to pull, no 9 GB
 # .sif to keep in sync, and every compute node sees identical bytes. A locally
 # pulled .sif still works — point MUCOLL_IMAGE at it.
-export MUCOLL_IMAGE="${MUCOLL_IMAGE:-/cvmfs/unpacked.cern.ch/ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.1-amd64}"
+export MUCOLL_IMAGE="${MUCOLL_IMAGE:-/cvmfs/unpacked.cern.ch/ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.2-amd64}"
 
 # Bind /cvmfs so a CVMFS-hosted image can resolve its own layers inside the
 # container. Harmless for a local .sif.

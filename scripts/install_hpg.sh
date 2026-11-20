@@ -7,7 +7,7 @@ MUONCOLLIDER_DIR="$(cd "$SLURM_DIR/.." && pwd)"
 
 source "$SLURM_DIR/lib/image.sh"
 
-echo "=== MuColl-SLURM setup for HiPerGator (MAIA v3.1) ==="
+echo "=== MuColl-SLURM setup for HiPerGator (MAIA v3.2) ==="
 echo "Base directory: $MUONCOLLIDER_DIR"
 
 # 1. Container image — nothing to pull by default
@@ -17,7 +17,7 @@ else
     echo "ERROR: container image not found at $MUCOLL_IMAGE" >&2
     echo "       The default is served from CVMFS; check that /cvmfs is mounted here." >&2
     echo "       To use a local copy instead:" >&2
-    echo "         apptainer pull $SLURM_DIR/mucoll-sim.sif docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.1" >&2
+    echo "         apptainer pull $SLURM_DIR/mucoll-sim.sif docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.2" >&2
     echo "         export MUCOLL_IMAGE=$SLURM_DIR/mucoll-sim.sif" >&2
     exit 1
 fi
@@ -30,7 +30,7 @@ fi
 # This checkout is deliberately separate from any old samf25/k4MuC one — the two
 # layouts are incompatible, so main and this branch can coexist. Override with
 # MUCOLL_BENCHMARKS.
-BENCHMARKS_PATH="${MUCOLL_BENCHMARKS:-$MUONCOLLIDER_DIR/mucoll-benchmarks-v3.1}"
+BENCHMARKS_PATH="${MUCOLL_BENCHMARKS:-$MUONCOLLIDER_DIR/mucoll-benchmarks-v3.2}"
 
 # Pinned, deliberately. Two reasons:
 #   1. Reproducibility — an unpinned clone means every install gets a different
@@ -40,9 +40,10 @@ BENCHMARKS_PATH="${MUCOLL_BENCHMARKS:-$MUONCOLLIDER_DIR/mucoll-benchmarks-v3.1}"
 #      seed for pgun") left generation/pgun/pgun_edm4hep.py:160 indented with a
 #      space followed by a tab; Python rejects that outright (TabError), so the
 #      whole pgun sample dies at GEN on any checkout at or after it.
-# ce72cf0 (2026-08-15, "bumped MAIA config") is the revision every production in
-# PRODUCTION_LOG.md was generated against. Bump it deliberately, not by accident.
-BENCHMARKS_REF_DEFAULT=ce72cf07c513bf845d78635236367fc561e98f70
+# ce72cf0 (2026-08-15, "bumped MAIA config") is the revision every v3.1 production in
+# PRODUCTION_LOG.md was generated against. f1d1cdd is the `v3.2` tag (2026-11-14), which
+# pins MAIAConfig 8831727. Bump it deliberately, not by accident.
+BENCHMARKS_REF_DEFAULT=f1d1cddc412fa037dd21449af90c97ce4d16f293
 BENCHMARKS_REF="${MUCOLL_BENCHMARKS_REF:-$BENCHMARKS_REF_DEFAULT}"
 
 if [ -d "$BENCHMARKS_PATH" ]; then
@@ -54,7 +55,7 @@ if [ -d "$BENCHMARKS_PATH" ]; then
         echo "                     && git -C $BENCHMARKS_PATH submodule update --init --recursive"
     fi
 else
-    echo "Cloning mucoll-benchmarks (v3.1) at pinned $BENCHMARKS_REF ..."
+    echo "Cloning mucoll-benchmarks (v3.2) at pinned $BENCHMARKS_REF ..."
     git clone https://github.com/MuonColliderSoft/mucoll-benchmarks.git "$BENCHMARKS_PATH"
     git -C "$BENCHMARKS_PATH" checkout --quiet "$BENCHMARKS_REF"
     # Submodule pointers are per-commit, so init them AFTER checking out the pin.

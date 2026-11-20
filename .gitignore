@@ -10,4 +10,5 @@ pythia/MuMuToZH
 pythia/LheToHepMC
 pythia/probeZdecay
 .redo_*.sh
+.bib_*.sh
 .gridpack_*.sh

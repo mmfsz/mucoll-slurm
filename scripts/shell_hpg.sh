@@ -8,7 +8,7 @@ if [ ! -e "$MUCOLL_IMAGE" ]; then
     echo "Container image not found at $MUCOLL_IMAGE"
     echo "The default lives on CVMFS — check that /cvmfs is mounted on this node."
     echo "To use a local copy instead:"
-    echo "  apptainer pull $BASEDIR/mucoll-sim.sif docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.1"
+    echo "  apptainer pull $BASEDIR/mucoll-sim.sif docker://ghcr.io/muoncollidersoft/mucoll-sim-ubuntu24:v3.2"
     echo "  MUCOLL_IMAGE=$BASEDIR/mucoll-sim.sif source scripts/shell_hpg.sh"
     return 1 2>/dev/null || exit 1
 fi

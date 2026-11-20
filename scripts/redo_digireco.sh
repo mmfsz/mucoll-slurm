@@ -17,7 +17,7 @@ NEVENTS=${2:-50}
 [ -d "$JOB_DIR" ] || { echo "ERROR: no such job dir: $JOB_DIR" >&2; exit 2; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-BENCH="${MUCOLL_BENCHMARKS:-$(dirname "$SCRIPT_DIR")/mucoll-benchmarks-v3.1}"
+BENCH="${MUCOLL_BENCHMARKS:-$(dirname "$SCRIPT_DIR")/mucoll-benchmarks-v3.2}"
 GEO="${MUCOLL_GEOMETRY:-MAIA_v0}"
 
 sim=$(ls "$JOB_DIR"/sim_output_*.edm4hep.root 2>/dev/null | head -1)
