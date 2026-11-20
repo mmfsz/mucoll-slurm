@@ -348,3 +348,51 @@ a red flag, not good news.
   are ~10 min, these are repaired in place with `scripts/redo_digireco.sh` rather than
   regenerated. That script runs both stages in node scratch and only replaces the originals
   after verifying the event count.
+
+## 2026-11-20 16:35:17 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 1 -e 2 --tag v3p2_validate --qos avery`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `pgun_v3p2_validate`: 1 jobs (ids 52123448–52123448) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/pgun_v3p2_validate/`
+
+## 2026-11-20 16:50:12 — submit_bib.py BIB digi+reco
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 0 -e 5 --first-event 0 --events-per-job 5 --split --mem 16G --cpus 4`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib0_bench`: array 52125528 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib0_bench/`
+  - `vbfH_bb_pt500_lhe_v3p2_bib0_bench`: array 52125529 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib0_bench/`
+
+## 2026-11-20 16:50:12 — submit_bib.py BIB digi+reco
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 167 -e 5 --first-event 0 --events-per-job 5 --split --mem 32G --cpus 4`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib167_bench`: array 52125530 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib167_bench/`
+  - `vbfH_bb_pt500_lhe_v3p2_bib167_bench`: array 52125531 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib167_bench/`
+
+## 2026-11-20 16:50:13 — submit_bib.py BIB digi+reco
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 833 -e 5 --first-event 0 --events-per-job 5 --split --mem 64G --cpus 4`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib833_bench`: array 52125532 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib833_bench/`
+  - `vbfH_bb_pt500_lhe_v3p2_bib833_bench`: array 52125536 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib833_bench/`
+
+## 2026-11-20 16:50:13 — submit_bib.py BIB digi+reco
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 5 --first-event 0 --events-per-job 5 --split --mem 96G --cpus 4`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_bench`: array 52125540 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_bench/`
+  - `vbfH_bb_pt500_lhe_v3p2_bib1666_bench`: array 52125541 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib1666_bench/`
+
+## 2026-11-20 16:50:15 — submit_bib.py BIB digi+reco
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 5 --first-event 0 --events-per-job 5 --split --calo-coning --mem 96G --cpus 4`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc_bench`: array 52125542 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc_bench/`
+  - `vbfH_bb_pt500_lhe_v3p2_bib1666_cc_bench`: array 52125543 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib1666_cc_bench/`
+
+## 2026-11-20 16:50:15 — submit_bib.py BIB digi+reco
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 5 --first-event 0 --events-per-job 5 --split --calo-coning --tracker-coning --mem 96G --cpus 4`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc_tc_bench`: array 52125544 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc_tc_bench/`
+  - `vbfH_bb_pt500_lhe_v3p2_bib1666_cc_tc_bench`: array 52125545 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib1666_cc_tc_bench/`
