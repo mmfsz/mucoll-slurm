@@ -22,14 +22,14 @@ set -e
 
 SIM=$1; FIRST=$2; NEV=$3; OUT_DIR=$4; BIB_N=$5; SEED=$6
 shift 6 || { echo "usage: $0 SIM FIRST NEV OUT_DIR BIB_N SEED [options]" >&2; exit 2; }
-SPLIT=0; KEEP_DIGI=0; KEEP_HITS=0; CONING=()
+SPLIT=0; KEEP_DIGI=0; KEEP_HITS=0; CONING=(); RECO_CONING=()
 while [ $# -gt 0 ]; do
     case $1 in
         --split) SPLIT=1 ;;
         --keep-digi) KEEP_DIGI=1 ;;
         --keep-hits) KEEP_HITS=1 ;;
         --calo-coning) CONING+=(--doCaloConing) ;;
-        --tracker-coning) CONING+=(--doTrackerConing) ;;
+        --tracker-coning) CONING+=(--doTrackerConing); RECO_CONING+=(--doTrackerConing) ;;
         *) echo "ERROR: unknown option $1" >&2; exit 2 ;;
     esac
     shift
@@ -98,7 +98,7 @@ if [ "$SPLIT" = 1 ]; then
         --inputFiles "$SIM" --outputFile digi.edm4hep.root --histoFile digi_histos.root
     echo "STAGE_SIZE digi_mb=$(( $(stat -c %s digi.edm4hep.root) / 1048576 ))"
     # The digi file holds only the NEV processed events, so RECO starts at entry 0.
-    stage reco k4run "$CONFIG/reco_steer.py" -n "$NEV" "${SLIM[@]}" "${CONING[@]}" \
+    stage reco k4run "$CONFIG/reco_steer.py" -n "$NEV" "${SLIM[@]}" "${RECO_CONING[@]}" \
         --TrackingThreads "$CPUS" \
         --inputFiles digi.edm4hep.root --outputFile reco.edm4hep.root --histoFile reco_histos.root
 else

@@ -71,7 +71,9 @@ def main():
             return mean(v) if v else None
 
         digi, reco, both = per_ev("digi"), per_ev("reco"), per_ev("digireco")
-        total = both if both is not None else (digi or 0) + (reco or 0) if ok else None
+        # A total (and a projection) only when every stage finished: DIGI alone
+        # understates the cost badly, since RECO dominates once BIB is on.
+        total = both if both is not None else (digi + reco if digi is not None and reco is not None else None)
         rss = max((s[1] for r in recs for s in r["stages"].values()), default=None)
         fmt = lambda x, d=0: "-" if x is None else f"{x:.{d}f}"
         print(" | ".join([sample, str(n), f"{100 * n / 1666:.0f}", coning, str(len(recs)),
