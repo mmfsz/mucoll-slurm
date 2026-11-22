@@ -587,3 +587,81 @@ a red flag, not good news.
   own `submit_bib.py` entry here.
 - 100 % BIB *without* coning, first event of RECO alone: ZH 23.7 h, vbfH 25.0 h (both jobs
   cancelled afterwards). With calorimeter coning the ZH production averages ~0.65 h/event.
+
+## 2026-11-22 11:01:16 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 10 -e 1 --first-event 50 --events-per-job 1 --split --keep-digi --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfW_qq_pt500_lhe_v3p2_bib10_ccnt_val`: array 52345328 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib10_ccnt_val/`
+  - `vbfH_bb_pt500_lhe_v3p2_bib10_ccnt_val`: array 52345329 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib10_ccnt_val/`
+  - `ZH_bbbb_lhe_v3p2_bib10_ccnt_val`: array 52345330 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib10_ccnt_val/`
+
+## 2026-11-22 11:01:17 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 10 -e 1 --first-event 53 --events-per-job 1 --split --keep-digi --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfW_qq_pt500_lhe_v3p2_bib10_ccnt_val`: array 52345331 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib10_ccnt_val/`
+
+## 2026-11-22 11:02:54 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 10 -e 1 --first-event 50 --events-per-job 1 --split --keep-digi --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfW_qq_pt500_lhe_v3p2_bib10_ccnt_val`: array 52345504 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib10_ccnt_val/`
+  - `vbfH_bb_pt500_lhe_v3p2_bib10_ccnt_val`: array 52345505 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib10_ccnt_val/`
+  - `ZH_bbbb_lhe_v3p2_bib10_ccnt_val`: array 52345506 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib10_ccnt_val/`
+
+## 2026-11-22 11:02:54 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 10 -e 1 --first-event 53 --events-per-job 1 --split --keep-digi --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfW_qq_pt500_lhe_v3p2_bib10_ccnt_val`: array 52345509 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib10_ccnt_val/`
+
+## 2026-11-22 11:11:55 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 1 --first-event 100 --events-per-job 1 --tagveto-coning --mem 30G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt500_lhe_v3p2_bib1666_ccnt_bench`: array 52346016 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib1666_ccnt_bench/`
+  - `vbfW_qq_pt500_lhe_v3p2_bib1666_ccnt_bench`: array 52346017 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib1666_ccnt_bench/`
+  - `vbfZ_qq_pt500_lhe_v3p2_bib1666_ccnt_bench`: array 52346018 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt500_lhe_v3p2_bib1666_ccnt_bench/`
+  - `vbfZ_qq_pt0to100_lhe_v3p2_bib1666_ccnt_bench`: array 52346019 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt0to100_lhe_v3p2_bib1666_ccnt_bench/`
+
+## 2026-11-22 11:14:51 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 100 --first-event 156 --events-per-job 2 --calo-coning --mem 30G --cpus 2 --throttle 200`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52346217 (50 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-22 11:20 — ZH 100 % BIB (cc): last 4-CPU tasks moved to 2 CPUs
+- Array 52279644 now covers only events 2..155 (tasks 0..76). Its tasks 77..126 (events
+  156..255) were cancelled before starting — still queued after >1 h while the 2-CPU tasks
+  behind them ran — and resubmitted with 2 CPUs as 52346217.
+- 2-CPU tasks (52341183, first 22 done): median 50 min, max 74 min, peak RSS 18.5 GB, CPU
+  efficiency 66 % (34 % at 4 CPUs); no failures.
+
+## 2026-11-22 12:35:13 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 18 --first-event 782 --events-per-job 2 --calo-coning --mem 30G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52352764 (9 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-22 12:55:16 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 18 --first-event 764 --events-per-job 2 --calo-coning --mem 30G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52354342 (9 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-22 13:17:09 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 1000 --first-event 0 --events-per-job 2 --tagveto-coning --mem 24G --cpus 2 --throttle 150`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt500_lhe_v3p2_bib1666_ccnt`: array 52355931 (500 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib1666_ccnt/`
+  - `vbfW_qq_pt500_lhe_v3p2_bib1666_ccnt`: array 52355932 (500 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib1666_ccnt/`
+  - `vbfZ_qq_pt500_lhe_v3p2_bib1666_ccnt`: array 52355933 (500 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt500_lhe_v3p2_bib1666_ccnt/`
+
+## 2026-11-22 13:17:09 — submit_bib.py BIB digi+reco
+- commit: `3df2b60c441ebb25b303b1d229452791a7a15f97` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 0 -e 1000 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt500_lhe_v3p2_bib0_ccnt`: array 52355934 (20 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib0_ccnt/`
+  - `vbfW_qq_pt500_lhe_v3p2_bib0_ccnt`: array 52355935 (20 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib0_ccnt/`
+  - `vbfZ_qq_pt500_lhe_v3p2_bib0_ccnt`: array 52355936 (20 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt500_lhe_v3p2_bib0_ccnt/`
