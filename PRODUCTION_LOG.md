@@ -348,3 +348,131 @@ a red flag, not good news.
   are ~10 min, these are repaired in place with `scripts/redo_digireco.sh` rather than
   regenerated. That script runs both stages in node scratch and only replaces the originals
   after verifying the event count.
+
+## 2026-11-20 15:33:41 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 2 -e 10 --tag smallR_smoke --qos avery-b`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfH_bb_pt0to100_lhe_smallR_smoke`: 2 jobs (ids 52115763–52115764) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt0to100_lhe_smallR_smoke/`
+  - `vbfH_bb_pt100to200_lhe_smallR_smoke`: 2 jobs (ids 52115765–52115766) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt100to200_lhe_smallR_smoke/`
+  - `vbfH_bb_pt200to300_lhe_smallR_smoke`: 2 jobs (ids 52115767–52115768) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt200to300_lhe_smallR_smoke/`
+  - `vbfH_bb_pt300to400_lhe_smallR_smoke`: 2 jobs (ids 52115769–52115770) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt300to400_lhe_smallR_smoke/`
+  - `vbfH_bb_pt400to500_lhe_smallR_smoke`: 2 jobs (ids 52115771–52115772) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt400to500_lhe_smallR_smoke/`
+  - `vbfZ_qq_pt0to100_lhe_smallR_smoke`: 2 jobs (ids 52115773–52115774) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt0to100_lhe_smallR_smoke/`
+  - `vbfZ_qq_pt100to200_lhe_smallR_smoke`: 2 jobs (ids 52115775–52115776) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt100to200_lhe_smallR_smoke/`
+  - `vbfZ_qq_pt200to300_lhe_smallR_smoke`: 2 jobs (ids 52115777–52115778) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt200to300_lhe_smallR_smoke/`
+  - `vbfZ_qq_pt300to400_lhe_smallR_smoke`: 2 jobs (ids 52115779–52115780) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt300to400_lhe_smallR_smoke/`
+  - `vbfZ_qq_pt400to500_lhe_smallR_smoke`: 2 jobs (ids 52115781–52115782) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt400to500_lhe_smallR_smoke/`
+  - `vbfW_qq_pt0to100_lhe_smallR_smoke`: 2 jobs (ids 52115783–52115784) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt0to100_lhe_smallR_smoke/`
+  - `vbfW_qq_pt100to200_lhe_smallR_smoke`: 2 jobs (ids 52115785–52115786) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt100to200_lhe_smallR_smoke/`
+  - `vbfW_qq_pt200to300_lhe_smallR_smoke`: 2 jobs (ids 52115787–52115788) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt200to300_lhe_smallR_smoke/`
+  - `vbfW_qq_pt300to400_lhe_smallR_smoke`: 2 jobs (ids 52115789–52115790) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt300to400_lhe_smallR_smoke/`
+  - `vbfW_qq_pt400to500_lhe_smallR_smoke`: 2 jobs (ids 52115791–52115792) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt400to500_lhe_smallR_smoke/`
+
+## 2026-11-20 15:33:49 — make_gridpack.py
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- gridpacks:
+  - `vbfH_pt0to100`: jobid 52115795 → `output/gridpacks/mumu_vbfH_pt0to100_10TeV/`
+  - `vbfH_pt100to200`: jobid 52115796 → `output/gridpacks/mumu_vbfH_pt100to200_10TeV/`
+  - `vbfH_pt200to300`: jobid 52115797 → `output/gridpacks/mumu_vbfH_pt200to300_10TeV/`
+  - `vbfH_pt300to400`: jobid 52115798 → `output/gridpacks/mumu_vbfH_pt300to400_10TeV/`
+  - `vbfH_pt400to500`: jobid 52115799 → `output/gridpacks/mumu_vbfH_pt400to500_10TeV/`
+  - `vbfZ_pt0to100`: jobid 52115800 → `output/gridpacks/mumu_vbfZ_pt0to100_10TeV/`
+  - `vbfZ_pt100to200`: jobid 52115801 → `output/gridpacks/mumu_vbfZ_pt100to200_10TeV/`
+  - `vbfZ_pt200to300`: jobid 52115802 → `output/gridpacks/mumu_vbfZ_pt200to300_10TeV/`
+  - `vbfZ_pt300to400`: jobid 52115803 → `output/gridpacks/mumu_vbfZ_pt300to400_10TeV/`
+  - `vbfZ_pt400to500`: jobid 52115804 → `output/gridpacks/mumu_vbfZ_pt400to500_10TeV/`
+  - `vbfW_pt0to100`: jobid 52115805 → `output/gridpacks/mumu_vbfW_pt0to100_10TeV/`
+  - `vbfW_pt100to200`: jobid 52115806 → `output/gridpacks/mumu_vbfW_pt100to200_10TeV/`
+  - `vbfW_pt200to300`: jobid 52115807 → `output/gridpacks/mumu_vbfW_pt200to300_10TeV/`
+  - `vbfW_pt300to400`: jobid 52115808 → `output/gridpacks/mumu_vbfW_pt300to400_10TeV/`
+  - `vbfW_pt400to500`: jobid 52115809 → `output/gridpacks/mumu_vbfW_pt400to500_10TeV/`
+
+## 2026-11-20 16:09:03 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 2 -e 10 --tag smallR_smoke2 --qos avery-b`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfH_bb_pt0to100_lhe_smallR_smoke2`: 2 jobs (ids 52120263–52120264) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt0to100_lhe_smallR_smoke2/`
+  - `vbfH_bb_pt100to200_lhe_smallR_smoke2`: 2 jobs (ids 52120265–52120266) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt100to200_lhe_smallR_smoke2/`
+  - `vbfH_bb_pt200to300_lhe_smallR_smoke2`: 2 jobs (ids 52120267–52120268) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt200to300_lhe_smallR_smoke2/`
+  - `vbfH_bb_pt300to400_lhe_smallR_smoke2`: 2 jobs (ids 52120269–52120270) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt300to400_lhe_smallR_smoke2/`
+  - `vbfH_bb_pt400to500_lhe_smallR_smoke2`: 2 jobs (ids 52120271–52120272) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt400to500_lhe_smallR_smoke2/`
+
+## 2026-11-20 16:21:33 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115800`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfZ_qq_pt0to100_lhe_v3p1`: 100 jobs (ids 52121600–52121701, afterok:52115800) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt0to100_lhe_v3p1/`
+
+## 2026-11-20 16:21:39 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115801`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfZ_qq_pt100to200_lhe_v3p1`: 100 jobs (ids 52121702–52121813, afterok:52115801) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt100to200_lhe_v3p1/`
+
+## 2026-11-20 16:21:48 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115802`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfZ_qq_pt200to300_lhe_v3p1`: 100 jobs (ids 52121814–52121917, afterok:52115802) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt200to300_lhe_v3p1/`
+
+## 2026-11-20 16:21:57 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115803`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfZ_qq_pt300to400_lhe_v3p1`: 100 jobs (ids 52121918–52122027, afterok:52115803) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt300to400_lhe_v3p1/`
+
+## 2026-11-20 16:22:05 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115804`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfZ_qq_pt400to500_lhe_v3p1`: 100 jobs (ids 52122028–52122128, afterok:52115804) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt400to500_lhe_v3p1/`
+
+## 2026-11-20 16:22:14 — make_gridpack.py
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- gridpacks:
+  - `vbfH_pt0to100`: jobid 52122131 → `output/gridpacks/mumu_vbfH_pt0to100_10TeV/`
+  - `vbfH_pt100to200`: jobid 52122132 → `output/gridpacks/mumu_vbfH_pt100to200_10TeV/`
+  - `vbfH_pt200to300`: jobid 52122133 → `output/gridpacks/mumu_vbfH_pt200to300_10TeV/`
+  - `vbfH_pt300to400`: jobid 52122134 → `output/gridpacks/mumu_vbfH_pt300to400_10TeV/`
+  - `vbfH_pt400to500`: jobid 52122135 → `output/gridpacks/mumu_vbfH_pt400to500_10TeV/`
+
+## 2026-11-20 16:41:24 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115805`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfW_qq_pt0to100_lhe_v3p1`: 100 jobs (ids 52124158–52124265, afterok:52115805) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt0to100_lhe_v3p1/`
+
+## 2026-11-20 16:41:32 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115806`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfW_qq_pt100to200_lhe_v3p1`: 100 jobs (ids 52124272–52124372, afterok:52115806) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt100to200_lhe_v3p1/`
+
+## 2026-11-20 16:41:41 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115807`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfW_qq_pt200to300_lhe_v3p1`: 100 jobs (ids 52124373–52124477, afterok:52115807) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt200to300_lhe_v3p1/`
+
+## 2026-11-20 16:41:47 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115808`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfW_qq_pt300to400_lhe_v3p1`: 100 jobs (ids 52124478–52124578, afterok:52115808) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt300to400_lhe_v3p1/`
+
+## 2026-11-20 16:41:56 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b --after 52115809`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfW_qq_pt400to500_lhe_v3p1`: 100 jobs (ids 52124579–52124679, afterok:52115809) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt400to500_lhe_v3p1/`
+
+## 2026-11-20 18:07:44 — submit.py production
+- commit: `70e386d0385ff50c63f57c4fedc89a96231ed824` (DIRTY — SHA does NOT capture the exact code)
+- params: `-n 100 -e 50 --tag v3p1 --qos avery-b`  (output base `/cmsuf/data/store/user/mmazza/mucoll/samples`)
+- production:
+  - `vbfH_bb_pt0to100_lhe_v3p1`: 100 jobs (ids 52133348–52133461) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt0to100_lhe_v3p1/`
+  - `vbfH_bb_pt100to200_lhe_v3p1`: 100 jobs (ids 52133462–52133561) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt100to200_lhe_v3p1/`
+  - `vbfH_bb_pt200to300_lhe_v3p1`: 100 jobs (ids 52133562–52133661) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt200to300_lhe_v3p1/`
+  - `vbfH_bb_pt300to400_lhe_v3p1`: 100 jobs (ids 52133662–52133761) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt300to400_lhe_v3p1/`
+  - `vbfH_bb_pt400to500_lhe_v3p1`: 100 jobs (ids 52133762–52133861) → `../../../../../cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt400to500_lhe_v3p1/`

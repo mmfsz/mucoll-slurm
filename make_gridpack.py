@@ -76,6 +76,67 @@ PROCESSES = {
         "sin_template": os.path.join(GRID_CARDS, "mumu_vbfW_pt500_10TeV.gridpack.sin"),
         "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfW_pt500_10TeV"),
     },
+    # VBF single-boson 100 GeV pT slices (small-R jets); pt500 above is the top slice.
+    "vbfH_pt0to100": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfH_pt0to100_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfH_pt0to100_10TeV"),
+    },
+    "vbfH_pt100to200": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfH_pt100to200_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfH_pt100to200_10TeV"),
+    },
+    "vbfH_pt200to300": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfH_pt200to300_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfH_pt200to300_10TeV"),
+    },
+    "vbfH_pt300to400": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfH_pt300to400_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfH_pt300to400_10TeV"),
+    },
+    "vbfH_pt400to500": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfH_pt400to500_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfH_pt400to500_10TeV"),
+    },
+    "vbfZ_pt0to100": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfZ_pt0to100_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfZ_pt0to100_10TeV"),
+    },
+    "vbfZ_pt100to200": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfZ_pt100to200_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfZ_pt100to200_10TeV"),
+    },
+    "vbfZ_pt200to300": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfZ_pt200to300_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfZ_pt200to300_10TeV"),
+    },
+    "vbfZ_pt300to400": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfZ_pt300to400_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfZ_pt300to400_10TeV"),
+    },
+    "vbfZ_pt400to500": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfZ_pt400to500_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfZ_pt400to500_10TeV"),
+    },
+    "vbfW_pt0to100": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfW_pt0to100_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfW_pt0to100_10TeV"),
+    },
+    "vbfW_pt100to200": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfW_pt100to200_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfW_pt100to200_10TeV"),
+    },
+    "vbfW_pt200to300": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfW_pt200to300_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfW_pt200to300_10TeV"),
+    },
+    "vbfW_pt300to400": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfW_pt300to400_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfW_pt300to400_10TeV"),
+    },
+    "vbfW_pt400to500": {
+        "sin_template": os.path.join(GRID_CARDS, "mumu_vbfW_pt400to500_10TeV.gridpack.sin"),
+        "workdir":  os.path.join(GRIDPACK_DIR, "mumu_vbfW_pt400to500_10TeV"),
+    },
     # Inclusive 2->4 processes (no resonance in ME).
     "nunuqq_Zmass_pt250": {
         "sin_template": os.path.join(GRID_CARDS, "mumu_nunuqq_Zmass_pt250_10TeV.gridpack.sin"),
@@ -92,7 +153,7 @@ PROCESSES = {
 }
 
 # This file is a script, not a library: everything below runs at import time and
-# submits SLURM jobs (24 h x 32 CPU each). Importing it — to inspect a constant,
+# submits SLURM jobs (24 h x 4 CPU each). Importing it — to inspect a constant,
 # say — would fire off the whole set, so refuse that outright.
 if __name__ != "__main__":
     raise ImportError(
@@ -108,7 +169,7 @@ parser.add_argument("processes", nargs="*", metavar="PROCESS",
                          f"Choices: {' '.join(PROCESSES)}")
 args = parser.parse_args()
 
-# No "submit everything" default, deliberately. Each process is its own 24 h x 32 CPU
+# No "submit everything" default, deliberately. Each process is its own 24 h x 4 CPU
 # SLURM job, so a bare `make_gridpack.py` used to fire off all of them at once — an
 # expensive thing to do by accident, and easy to do while exploring the command.
 if not args.processes:
@@ -118,7 +179,7 @@ if not args.processes:
     print("            python3 make_gridpack.py vbfZ vbfW      # space-separated",
           file=sys.stderr)
     print(f"\nThere is no 'all' default on purpose: each process is a separate "
-          f"24 h x 32 CPU\njob, so a bare invocation would submit all {len(PROCESSES)} "
+          f"24 h x 4 CPU\njob, so a bare invocation would submit all {len(PROCESSES)} "
           f"of them. If that is genuinely\nwhat you want, list them explicitly.",
           file=sys.stderr)
     sys.exit(2)
@@ -145,7 +206,7 @@ for name in args.processes:
 #SBATCH --mem=32G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=4
 #SBATCH --qos=avery-b
 
 echo "========================================"
@@ -156,7 +217,10 @@ echo "========================================"
 apptainer exec --cleanenv {IMAGE_BINDS} --bind {DATA_DIR_TO_BIND} {APPTAINER_IMAGE} bash -c '
     set -e
     {ENV_SETUP}
-    export OMP_NUM_THREADS=32
+    # No OMP_NUM_THREADS: Whizard 3.1.5 in the v3.1 image is built without OpenMP
+    # (every gridpack log: ?openmp_is_active = false, openmp_num_threads = 1), so it
+    # runs on one core whatever is requested. The old 32 CPUs left 31 idle and kept
+    # the jobs pending for hours.
 
     WORKDIR={cfg["workdir"]}
     cd $WORKDIR
