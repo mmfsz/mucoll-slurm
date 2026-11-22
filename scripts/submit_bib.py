@@ -62,6 +62,8 @@ def parse_args():
     p.add_argument("--qos", default="avery-b")
     p.add_argument("--throttle", type=int, default=None,
                    help="max simultaneously running tasks per sample (array %%K)")
+    p.add_argument("--dependency", default=None,
+                   help="passed to sbatch --dependency (e.g. afterok:<jobid> to chain after a test)")
     p.add_argument("--dry-run", action="store_true", help="write scripts but do not sbatch")
     return p.parse_args()
 
@@ -170,7 +172,8 @@ apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID \\
                 for sim, simjob, entry in tasks[:3]:
                     print(f"      {sim.name} entry {entry} seed {seed(key, simjob, entry)}")
                 continue
-            r = subprocess.run(["sbatch", str(script)], capture_output=True, text=True, check=True)
+            dep = [f"--dependency={args.dependency}"] if args.dependency else []
+            r = subprocess.run(["sbatch", *dep, str(script)], capture_output=True, text=True, check=True)
             jobid = r.stdout.strip().split()[-1]
             submitted[label] = (jobid, len(tasks))
             print(f"  {label} ({len(tasks)} tasks): {r.stdout.strip()}")
@@ -182,7 +185,9 @@ apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID \\
 
     if submitted:
         params = (f"--bib {n_bib} -e {args.nevents} --first-event {args.first_event} "
-                  f"--events-per-job {epj} {' '.join(flags)} --mem {args.mem} --cpus {args.cpus}")
+                  f"--events-per-job {epj} {' '.join(flags)} --mem {args.mem} --cpus {args.cpus}"
+                  + (f" --throttle {args.throttle}" if args.throttle else "")
+                  + (f" --dependency {args.dependency}" if args.dependency else ""))
         lines = [f"- params: `{params.strip()}`  (BIB `{BIB_DIR}`, SIM `{SIM_TAG}` reused)",
                  "- production:"]
         for label, (jobid, n) in submitted.items():

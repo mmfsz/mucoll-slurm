@@ -97,6 +97,10 @@ if [ "$SPLIT" = 1 ]; then
         "${OVERLAY[@]}" "${CONING[@]}" \
         --inputFiles "$SIM" --outputFile digi.edm4hep.root --histoFile digi_histos.root
     echo "STAGE_SIZE digi_mb=$(( $(stat -c %s digi.edm4hep.root) / 1048576 ))"
+    # A 100 % BIB digi event is ~2.3 GB compressed. ROOT sizes its default TTreeCache to
+    # the entry, overflows a 32-bit int and throws std::bad_alloc on the first read, so
+    # turn the cache off for RECO (ROOT reads ./.rootrc; we are in $WORK).
+    echo "TTreeCache.Size: 0" > .rootrc
     # The digi file holds only the NEV processed events, so RECO starts at entry 0.
     stage reco k4run "$CONFIG/reco_steer.py" -n "$NEV" "${SLIM[@]}" "${RECO_CONING[@]}" \
         --TrackingThreads "$CPUS" \
