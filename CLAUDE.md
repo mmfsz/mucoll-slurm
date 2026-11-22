@@ -234,7 +234,7 @@ The worktree is `../mucoll-slurm-v3.2`, kept separate so that v3.1 jobs queued f
   - The Yoke is not overlaid.
 - **Calorimeter coning (`--calo-coning`) is a truth cone of 0.6 rad around every stable
   generator particle,** so it also cones the VBF tag neutrinos/muons a few degrees from the
-  beam, where BIB is densest. **`--tagveto-coning`** (output `_ccnt`) cones around the same
+  beam, where BIB is densest. **`--tagveto-coning`** (output `_ccnotag`) cones around the same
   particles minus the hard-process tags: muons/neutrinos that are non-boson daughters of the
   status-21 beams, or their generator-level descendants (a radiated tag muon). It is the k4ext
   algorithm `HardProcessTagVeto` (`k4ext/ConeSeeds/`), inserted by `steering/*_tagveto.py`

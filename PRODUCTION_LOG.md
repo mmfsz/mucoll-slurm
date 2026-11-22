@@ -673,3 +673,18 @@ a red flag, not good news.
   `7669f2e`.
 - ZH 100 % BIB arrays 52341183 and 52346217: time limit lowered 24 h → 10 h in place
   (slowest 2-event task so far 5.6 h).
+
+## 2026-11-22 13:25:22 — submit_bib.py BIB digi+reco
+- commit: `ad64fc9c6b1e48586e4257d3f02669acc19685d9` (clean)
+- params: `--bib 1666 -e 16 --first-event 748 --events-per-job 2 --calo-coning --mem 30G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52356608 (8 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-22 12:50 — tag-veto output suffix renamed `_ccnt` → `_ccnotag`
+- `submit_bib.py --tagveto-coning` now writes `<KEY>_v3p2_bib<N>_ccnotag[_<tag>]/`. Every
+  `_ccnt` path in the entries above now lives under the `_ccnotag` name.
+- Arrays 52355931–36 and the bench/val jobs were submitted with `_ccnt`: their task tables
+  (`logs/bib_*_ccnt_*.tasks`, file names unchanged) were rewritten to `_ccnotag` before most
+  tasks started. The tasks already running at the change read the old path, so
+  `<KEY>_..._ccnt` is a symlink to `<KEY>_..._ccnotag` until they finish; then the symlinks
+  are removed. Finished bench/val dirs were renamed. SLURM job and log names keep `_ccnt`.
