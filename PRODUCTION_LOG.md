@@ -417,3 +417,45 @@ a red flag, not good news.
 - production:
   - `ZH_bbbb_lhe_v3p2_bib1666_cc_tc_bench`: array 52220572 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc_tc_bench/`
   - `vbfH_bb_pt500_lhe_v3p2_bib1666_cc_tc_bench`: array 52220573 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib1666_cc_tc_bench/`
+
+## 2026-11-21 20:56:07 — submit_bib.py BIB digi+reco
+- commit: `3ec2fa37ea81941aac0e0d3a01b7aca910c1ac73` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 2 --first-event 0 --events-per-job 2 --calo-coning --mem 40G --cpus 4`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52279642 (1 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-21 20:56:12 — submit_bib.py BIB digi+reco
+- commit: `3ec2fa37ea81941aac0e0d3a01b7aca910c1ac73` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 998 --first-event 2 --events-per-job 2 --calo-coning --mem 40G --cpus 4 --throttle 50 --dependency afterok:52279642`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52279644 (499 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-21 20:56:12 — submit_bib.py BIB digi+reco
+- commit: `3ec2fa37ea81941aac0e0d3a01b7aca910c1ac73` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 0 -e 1000 --first-event 0 --events-per-job 50 --calo-coning --mem 8G --cpus 4`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib0_cc`: array 52279645 (20 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib0_cc/`
+
+## 2026-11-22 09:32:21 — submit_bib.py BIB digi+reco
+- commit: `3ec2fa37ea81941aac0e0d3a01b7aca910c1ac73` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 200 --first-event 800 --events-per-job 2 --calo-coning --mem 30G --cpus 4 --throttle 50`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52339735 (100 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-22 09:53:46 — submit_bib.py BIB digi+reco
+- commit: `3ec2fa37ea81941aac0e0d3a01b7aca910c1ac73` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 544 --first-event 256 --events-per-job 2 --calo-coning --mem 30G --cpus 2 --throttle 200`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52341183 (272 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-22 09:55 — ZH 100 % BIB (cc): queue moves, no events duplicated
+- Array 52279644 now covers only events 2..255 (tasks 0..126). Its tasks 399..498 (events
+  800..999) were cancelled before starting and resubmitted on the `avery` QOS as 52339735.
+  Its tasks 127..398 (events 256..799) were cancelled before starting and resubmitted with
+  2 CPUs as 52341183, because only tracking is multithreaded (36 % CPU efficiency at 4 CPUs).
+- Pending memory lowered 40G → 30G (peak RSS 15.9–18.5 GB on the first 59 tasks).
+- A monitor job (`output/bib_debug/bib_rebalance.sh`, not in the repo) moves further pending
+  tasks of 52341183 to `avery` whenever fewer than 50 of ours are there. Each move appends its
+  own `submit_bib.py` entry here.
+- 100 % BIB *without* coning, first event of RECO alone: ZH 23.7 h, vbfH 25.0 h (both jobs
+  cancelled afterwards). With calorimeter coning the ZH production averages ~0.65 h/event.
