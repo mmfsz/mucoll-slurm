@@ -1,0 +1,42 @@
+# mumu_vbfH_10TeV  —  Gridpack (phase-space integration only)
+########################################################################
+# WW-fusion single-H at 10 TeV, 100 < pT(H) < 200 GeV (small-R pT slice).
+# Shared by Sets 1/2/3 production cards — they all use the same hard ME.
+# Run once with many CPUs; production jobs load the resulting .vg files.
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfh = "e2", "E2" => "n2", "N2", "H"
+
+compile
+
+cuts = all M  > 150 GeV [n2, N2] and
+       all Pt > 5   GeV [n2:N2] and
+       all Pt > 100 GeV [H] and
+       all Pt < 200 GeV [H] and
+       all abs (Eta) < 2.3 [H]
+
+# Match the production card iteration parameters exactly so the grid is
+# fully-optimised when production loads it.
+# Heavier adaptation than pt500: at low pT(H) the default 5:50000 grid sometimes
+# misses part of phase space (smoke test 2026-11-20: 3.6-4.1% error, 10% sigma spread
+# between seeds, 0.01% efficiency). Production and gridpack cards must match.
+integrate (vbfh) { iterations = 15:500000:"gw", 10:1000000 }

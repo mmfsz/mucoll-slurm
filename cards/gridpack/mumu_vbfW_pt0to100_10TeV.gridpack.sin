@@ -1,0 +1,42 @@
+# mumu_vbfW_10TeV  —  Gridpack (phase-space integration only)
+########################################################################
+# WZ / W-gamma fusion single-W at 10 TeV, 0 < pT(W) < 100 GeV (small-R pT slice).
+# Both charges summed. Shared by Sets 1/2/3 production cards.
+########################################################################
+
+model = SM
+
+me     = 0.5109989e-3 GeV
+mmu    = 0.10565837 GeV
+ms     = 0
+mc     = 1.27 GeV
+mb     = 4.18 GeV
+mtop   = 174 GeV
+wtop   = 1.37 GeV
+mW     = 80.45 GeV
+wW     = 2.071 GeV
+mZ     = 91.188 GeV
+wZ     = 2.478 GeV
+mH     = 125 GeV
+wH     = 0.00407 GeV
+
+alias lTag  = e2:E2
+alias nuTag = n2:N2
+# W boson alias — MUST be used (unquoted) in cuts. A literal ["W+","W-"] in a
+# cut subevent is silently ignored by Whizard (resolves to an empty set, so the
+# pt/eta cut is vacuously true and never fires). Use [Wpm] instead.
+alias Wpm   = "W+":"W-"
+
+sqrts = 10 TeV
+seed  = 1234
+
+process vbfw = "e2", "E2" => ("e2", "N2", "W+") + ("E2", "n2", "W-")
+
+compile
+
+cuts = all M  > 150 GeV [lTag, nuTag] and
+       all Pt > 5   GeV [lTag:nuTag] and
+       all Pt < 100 GeV [Wpm] and
+       all abs (Eta) < 2.3 [Wpm]
+
+integrate (vbfw) { iterations = 10:100000:"gw", 10:200000 }

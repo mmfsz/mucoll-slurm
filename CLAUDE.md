@@ -113,7 +113,7 @@ draw CPUs from). Use `submit.py --indices N N …` to (re)submit specific job in
 passes `--cleanenv`. Replaces the old `submit_jobs.py`, `submit_scan.py` (pgun),
 `submit_vbf_inclusive_10k.py`, `submit_ZH_lhe_test.py`, `submit_ZH_CR_tests.py`.
 
-`make_gridpack.py <PROCESS...>` pre-computes VAMP grids (24h, 32 CPU) into
+`make_gridpack.py <PROCESS...>` pre-computes VAMP grids (24h, 4 CPU — Whizard is single-threaded here) into
 `output/gridpacks/<gridpack>/`, using `cards/gridpack/` and `lib/env.sh`.
 
 ## HPG Workflow
