@@ -12,3 +12,5 @@ pythia/probeZdecay
 .redo_*.sh
 .bib_*.sh
 .gridpack_*.sh
+k4ext/build/
+k4ext/install/

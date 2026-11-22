@@ -14,6 +14,8 @@
 #   --keep-hits        keep the hit collections in the reco output (--keepEverything)
 #   --calo-coning      --doCaloConing (truth cone, 0.6 rad, before the BIB selection)
 #   --tracker-coning   --doTrackerConing (truth helix cones, 30 mm)
+#   --tagveto-coning   calorimeter coning as --calo-coning, but without cones around the
+#                      hard-process tag muons/neutrinos (steering/*_tagveto.py + k4ext)
 #
 # Each k4run is wrapped to print a "STAGE <name> wall_s=… maxrss_gb=… rc=…" line,
 # which scripts/bib_bench_summary.py parses. Run inside the container. Output:
@@ -22,13 +24,14 @@ set -e
 
 SIM=$1; FIRST=$2; NEV=$3; OUT_DIR=$4; BIB_N=$5; SEED=$6
 shift 6 || { echo "usage: $0 SIM FIRST NEV OUT_DIR BIB_N SEED [options]" >&2; exit 2; }
-SPLIT=0; KEEP_DIGI=0; KEEP_HITS=0; CONING=(); RECO_CONING=()
+SPLIT=0; KEEP_DIGI=0; KEEP_HITS=0; TAGVETO=0; CONING=(); RECO_CONING=()
 while [ $# -gt 0 ]; do
     case $1 in
         --split) SPLIT=1 ;;
         --keep-digi) KEEP_DIGI=1 ;;
         --keep-hits) KEEP_HITS=1 ;;
         --calo-coning) CONING+=(--doCaloConing) ;;
+        --tagveto-coning) TAGVETO=1; CONING+=(--doCaloConing) ;;
         --tracker-coning) CONING+=(--doTrackerConing); RECO_CONING+=(--doTrackerConing) ;;
         *) echo "ERROR: unknown option $1" >&2; exit 2 ;;
     esac
@@ -45,6 +48,12 @@ CPUS="${SLURM_CPUS_PER_TASK:-1}"
 source "$SCRIPT_DIR/lib/env.sh"
 source "$BENCH/setup_config.sh" "$BENCH" "$GEO" >/dev/null
 CONFIG="$MUCOLL_CONFIG/$MUCOLL_CONFIG_NAME"
+DIGI_STEER="$CONFIG/digi_steer.py"; DIGIRECO_STEER="$CONFIG/digi_reco_steer.py"
+if [ "$TAGVETO" = 1 ]; then
+    source "$SCRIPT_DIR/k4ext/env.sh" || exit 2
+    DIGI_STEER="$SCRIPT_DIR/steering/digi_steer_tagveto.py"
+    DIGIRECO_STEER="$SCRIPT_DIR/steering/digi_reco_steer_tagveto.py"
+fi
 
 # Overlay arguments. The overlay globs *.root in each directory and draws BIB_N
 # distinct files per beam per event, seeded by (RandSeed, event number, run number);
@@ -91,9 +100,9 @@ EOF
 
 COMMON=(-n "$NEV" --IOSvc.FirstEventEntry "$FIRST")
 echo "=== bib_digireco: $SIM entries [$FIRST, $((FIRST + NEV))) BIB_N=$BIB_N seed=$SEED" \
-     "split=$SPLIT coning=[${CONING[*]}] cpus=$CPUS host=$(hostname) ==="
+     "split=$SPLIT coning=[${CONING[*]}] tagveto=$TAGVETO cpus=$CPUS host=$(hostname) ==="
 if [ "$SPLIT" = 1 ]; then
-    stage digi k4run "$CONFIG/digi_steer.py" "${COMMON[@]}" --RandSeed "$SEED" \
+    stage digi k4run "$DIGI_STEER" "${COMMON[@]}" --RandSeed "$SEED" \
         "${OVERLAY[@]}" "${CONING[@]}" \
         --inputFiles "$SIM" --outputFile digi.edm4hep.root --histoFile digi_histos.root
     echo "STAGE_SIZE digi_mb=$(( $(stat -c %s digi.edm4hep.root) / 1048576 ))"
@@ -106,7 +115,7 @@ if [ "$SPLIT" = 1 ]; then
         --TrackingThreads "$CPUS" \
         --inputFiles digi.edm4hep.root --outputFile reco.edm4hep.root --histoFile reco_histos.root
 else
-    stage digireco k4run "$CONFIG/digi_reco_steer.py" "${COMMON[@]}" --RandSeed "$SEED" \
+    stage digireco k4run "$DIGIRECO_STEER" "${COMMON[@]}" --RandSeed "$SEED" \
         "${OVERLAY[@]}" "${SLIM[@]}" "${CONING[@]}" --TrackingThreads "$CPUS" \
         --inputFiles "$SIM" --outputFile reco.edm4hep.root --histoFile reco_histos.root
 fi

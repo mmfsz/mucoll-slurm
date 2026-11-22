@@ -7,7 +7,7 @@ a sample is entry i % 50 of sim job i // 50 (the _v3p1 productions are 100 jobs 
 --bib 0. One SLURM array task processes --events-per-job consecutive entries of one
 sim file.
 
-Output: <samples_base>/<KEY>_v3p2_bib<N>[_cc][_tc][_<tag>]/job_<simjob>/reco_output_e<entry>.edm4hep.root
+Output: <samples_base>/<KEY>_v3p2_bib<N>[_cc|_ccnt][_tc][_<tag>]/job_<simjob>/reco_output_e<entry>.edm4hep.root
 
 Examples:
   python scripts/submit_bib.py -s vbfZ_qq_pt500_lhe --bib 1666 -e 5 --events-per-job 5 --split --dry-run
@@ -54,6 +54,9 @@ def parse_args():
     p.add_argument("--keep-digi", action="store_true", help="with --split, keep the digi file")
     p.add_argument("--keep-hits", action="store_true", help="keep hit collections in the reco output")
     p.add_argument("--calo-coning", action="store_true", help="--doCaloConing")
+    p.add_argument("--tagveto-coning", action="store_true",
+                   help="--doCaloConing without cones around the hard-process tag muons/neutrinos "
+                        "(k4ext HardProcessTagVeto; output suffix _ccnt)")
     p.add_argument("--tracker-coning", action="store_true", help="--doTrackerConing")
     p.add_argument("--tag", default=None, help="suffix for the output dir (e.g. bench)")
     p.add_argument("--time", default="24:00:00")
@@ -97,11 +100,16 @@ def main():
                 sys.exit(f"ERROR: {BIB_DIR / beam} has {n} files, need >= {n_bib}")
     WORKER.chmod(0o755)
 
-    suffix = f"bib{n_bib}" + ("_cc" if args.calo_coning else "") \
+    if args.tagveto_coning and args.calo_coning:
+        sys.exit("ERROR: --tagveto-coning already implies calorimeter coning; drop --calo-coning")
+    if args.tagveto_coning and not (SLURM_DIR / "k4ext" / "install").is_dir():
+        sys.exit("ERROR: k4ext is not built; run k4ext/build.sh inside the container first")
+    suffix = f"bib{n_bib}" + ("_cc" if args.calo_coning else "_ccnt" if args.tagveto_coning else "") \
         + ("_tc" if args.tracker_coning else "") + (f"_{args.tag}" if args.tag else "")
     flags = [f for f, on in (("--split", args.split), ("--keep-digi", args.keep_digi),
                              ("--keep-hits", args.keep_hits),
                              ("--calo-coning", args.calo_coning),
+                             ("--tagveto-coning", args.tagveto_coning),
                              ("--tracker-coning", args.tracker_coning)) if on]
     out_base = samples_base()
 

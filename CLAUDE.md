@@ -232,6 +232,18 @@ The worktree is `../mucoll-slurm-v3.2`, kept separate so that v3.1 jobs queued f
   - Pass `--doOverlayFull` to RECO too. Its only effect there is to drop the hit
     collections (>1 GB/event with BIB).
   - The Yoke is not overlaid.
+- **Calorimeter coning (`--calo-coning`) is a truth cone of 0.6 rad around every stable
+  generator particle,** so it also cones the VBF tag neutrinos/muons a few degrees from the
+  beam, where BIB is densest. **`--tagveto-coning`** (output `_ccnt`) cones around the same
+  particles minus the hard-process tags: muons/neutrinos that are non-boson daughters of the
+  status-21 beams, or their generator-level descendants (a radiated tag muon). It is the k4ext
+  algorithm `HardProcessTagVeto` (`k4ext/ConeSeeds/`), inserted by `steering/*_tagveto.py`
+  in front of MAIAConfig's coners; MAIAConfig is not modified. On ZH it vetoes nothing, so it
+  equals `--calo-coning`. Build it in the container with `bash k4ext/build.sh`; like
+  `pythia/`, rebuild after every image bump.
+- **A 100 % BIB digi event is ~2.3 GB compressed.** ROOT's default TTreeCache then overflows
+  a 32-bit int and `TTree::GetEntry` throws `std::bad_alloc`, so `--split` RECO writes
+  `TTreeCache.Size: 0` to `./.rootrc`. Production (single process) never writes digi.
 
 ### MAIA v3.1 migration (2026-08-17)
 
