@@ -665,3 +665,11 @@ a red flag, not good news.
   - `vbfH_bb_pt500_lhe_v3p2_bib0_ccnt`: array 52355934 (20 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib0_ccnt/`
   - `vbfW_qq_pt500_lhe_v3p2_bib0_ccnt`: array 52355935 (20 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib0_ccnt/`
   - `vbfZ_qq_pt500_lhe_v3p2_bib0_ccnt`: array 52355936 (20 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt500_lhe_v3p2_bib0_ccnt/`
+
+## 2026-11-22 12:40 — provenance of the DIRTY entries above; ZH time limit
+- The VBF pt500 `_ccnt` submissions (52355931–36) and the tag-veto `val`/`bench` jobs were
+  logged as DIRTY at `3df2b60`. The code they ran (k4ext `HardProcessTagVeto`,
+  `steering/*_tagveto.py`, `bib_digireco.sh --tagveto-coning`) is committed unchanged as
+  `7669f2e`.
+- ZH 100 % BIB arrays 52341183 and 52346217: time limit lowered 24 h → 10 h in place
+  (slowest 2-event task so far 5.6 h).
