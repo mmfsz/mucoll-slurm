@@ -790,3 +790,28 @@ a red flag, not good news.
   them until the missing events are in.
 - Resubmitted below with `--missing` (1 event per job, 32G, 48 h, original seeds). The slice
   feeder was stopped; its last samples now use the same settings.
+
+## 2026-11-23 20:33:24 — submit_bib.py BIB digi+reco
+- commit: `3bbc07f0e513412b176cd3bcbd73ec08e0097795` (clean)
+- params: `--bib 1666 -e 1000 --first-event 0 --events-per-job 1 --calo-coning --mem 32G --cpus 2 --missing 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `ZH_bbbb_lhe_v3p2_bib1666_cc`: array 52518930 (28 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/ZH_bbbb_lhe_v3p2_bib1666_cc/`
+
+## 2026-11-23 20:36:49 — submit_bib.py BIB digi+reco
+- commit: `3bbc07f0e513412b176cd3bcbd73ec08e0097795` (clean)
+- params: `--bib 1666 -e 1000 --first-event 0 --events-per-job 1 --tagveto-coning --mem 32G --cpus 2 --missing 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt500_lhe_v3p2_bib1666_ccnotag`: array 52519130 (360 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt500_lhe_v3p2_bib1666_ccnotag/`
+  - `vbfW_qq_pt500_lhe_v3p2_bib1666_ccnotag`: array 52519131 (226 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt500_lhe_v3p2_bib1666_ccnotag/`
+  - `vbfZ_qq_pt500_lhe_v3p2_bib1666_ccnotag`: array 52519132 (314 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt500_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-23 20:39:07 — submit_bib.py BIB digi+reco
+- commit: `3bbc07f0e513412b176cd3bcbd73ec08e0097795` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 1 --tagveto-coning --mem 32G --cpus 2 --missing 1`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt0to100_lhe_v3p2_bib1666_ccnotag`: array 52519434 (149 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt0to100_lhe_v3p2_bib1666_ccnotag/`
+  - `vbfW_qq_pt0to100_lhe_v3p2_bib1666_ccnotag`: array 52519435 (99 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt0to100_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-23 — slice feeder restarted after the `--missing` submissions
+- Remaining batches: vbfZ_qq_pt300to400, then pt400to500 (500 one-event tasks each, 48 h, 32G),
+  one at a time when running+pending production tasks < 1000.

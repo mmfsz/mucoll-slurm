@@ -233,7 +233,7 @@ The worktree is `../mucoll-slurm-v3.2`, kept separate so that v3.1 jobs queued f
     collections (>1 GB/event with BIB).
   - The Yoke is not overlaid.
   - **Set time and memory limits from the tail, never from the first tasks to finish** (those
-    are the fast events). At 100 % BIB, 10 h per 2 events lost 31 % of the VBF pt500 events and
+    are the fast events). At 100 % BIB, 10 h per 2 events lost 30 % of the VBF pt500 events and
     12 h lost 30 % of vbfH pt0to100, and the loss depends on the boson's eta, so a production
     with timeouts is a biased sample. Use 1 event per job (the output is only copied at the
     end), 48 h and 32G (peak seen: 27 GB).
