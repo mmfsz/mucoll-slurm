@@ -783,7 +783,7 @@ a red flag, not good news.
 - production:
   - `vbfZ_qq_pt200to300_lhe_v3p2_bib0_ccnotag`: array 52468786 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt200to300_lhe_v3p2_bib0_ccnotag/`
 
-## 2026-11-23 14:45 — 100 % BIB timeouts; resubmission plan
+## 2026-11-23 20:35 — 100 % BIB timeouts; resubmission plan (counts of 14:31, unchanged at submission)
 - Lost to time limits (or 4 OOM at 24G): ZH 28 events, vbfH/W/Z pt500 360/226/314 of 1000, vbfH/W
   pt0to100 149/99 of 500. The 14 ZH timeouts come from the 24 h → 10 h cut of 2026-11-22, which
   was applied to running tasks too. Completed-only samples are biased in boson eta: do not use
