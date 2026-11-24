@@ -18,6 +18,7 @@ import argparse
 import os
 import subprocess
 import sys
+import time
 import zlib
 from pathlib import Path
 
@@ -67,7 +68,13 @@ def parse_args():
                    help="max simultaneously running tasks per sample (array %%K)")
     p.add_argument("--dependency", default=None,
                    help="passed to sbatch --dependency (e.g. afterok:<jobid> to chain after a test)")
-    p.add_argument("--dry-run", action="store_true", help="write scripts but do not sbatch")
+    p.add_argument("--missing", type=int, default=None, metavar="PAIR",
+                   help="submit only the events of the range with no output yet, one per task. PAIR is "
+                        "the events-per-job of the original production: each event reuses the seed of "
+                        "its original task. Counts the events in every file on disk (needs uproot) and "
+                        "refuses while jobs of the same sample are queued")
+    p.add_argument("--dry-run", action="store_true",
+                   help="write the sbatch scripts, but neither the task tables nor any job")
     return p.parse_args()
 
 
@@ -86,9 +93,36 @@ def seed(key, simjob, entry):
     return zlib.crc32(f"{key}:{simjob}:{entry}".encode()) & 0x7FFFFFFF
 
 
+def done_events(out_dir):
+    """Global indices of the events in out_dir, from the entries of each reco file."""
+    import uproot
+    done = set()
+    for f in sorted(out_dir.glob("job_*/reco_output_e*.edm4hep.root")):
+        first = SIM_EVENTS_PER_JOB * int(f.parent.name[len("job_"):]) \
+            + int(f.name[len("reco_output_e"):].split(".")[0])
+        try:
+            n = uproot.open(f)["events"].num_entries
+        except Exception as e:
+            print(f"  WARN: unreadable {f} ({type(e).__name__}) — counted as missing")
+            continue
+        done.update(range(first, first + n))
+    return done
+
+
+def queued(key, n_bib):
+    """Number of queued tasks of this sample and BIB level, whatever their coning suffix."""
+    r = subprocess.run(["squeue", "-h", "-r", "-u", os.environ["USER"], "-o", "%j"],
+                       capture_output=True, text=True, check=True)
+    return sum(j.startswith(f"bib_{key}_{OUT_TAG}_bib{n_bib}_") for j in r.stdout.split())
+
+
 def main():
     args = parse_args()
     n_bib = args.bib if args.bib is not None else round(args.bib_frac * FULL_BIB)
+    if args.missing is not None:
+        if args.missing < 1 or SIM_EVENTS_PER_JOB % args.missing:
+            sys.exit(f"ERROR: --missing must divide {SIM_EVENTS_PER_JOB}")
+        args.events_per_job = 1
     epj = args.events_per_job
     if SIM_EVENTS_PER_JOB % epj or args.first_event % epj or args.nevents % epj:
         sys.exit(f"ERROR: --events-per-job must divide {SIM_EVENTS_PER_JOB}, "
@@ -122,7 +156,16 @@ def main():
             ok = False
             continue
         tasks = []
+        done = set()
+        if args.missing is not None:
+            if n := queued(key, n_bib):
+                print(f"ERROR: {key}: {n} task(s) still queued; their events are not missing yet")
+                ok = False
+                continue
+            done = done_events(out_base / f"{key}_{OUT_TAG}_{suffix}")
         for first in range(args.first_event, args.first_event + args.nevents, epj):
+            if first in done:
+                continue
             simjob, entry = divmod(first, SIM_EVENTS_PER_JOB)
             sim = sd / f"job_{simjob}" / f"sim_output_{simjob}.edm4hep.root"
             if not sim.exists():
@@ -147,10 +190,14 @@ def main():
         label = f"{key}_{OUT_TAG}_{suffix}"
         out_dir = out_base / label
         # The task table maps array index -> (sim file, entry, seed, out dir).
-        table = log_dir / f"bib_{label}_e{args.first_event}.tasks"
-        table.write_text("".join(
-            f"{sim} {entry} {seed(key, simjob, entry)} {out_dir}/job_{simjob}\n"
-            for sim, simjob, entry in tasks))
+        # A resubmission gets its own table: the original one may still be read by jobs.
+        stamp = f"_missing_{time.strftime('%Y%m%d_%H%M%S')}" if args.missing is not None else ""
+        table = log_dir / f"bib_{label}_e{args.first_event}{stamp}.tasks"
+        task_seed = lambda simjob, entry: seed(key, simjob, entry - entry % (args.missing or 1))
+        if not args.dry_run:
+            table.write_text("".join(
+                f"{sim} {entry} {task_seed(simjob, entry)} {out_dir}/job_{simjob}\n"
+                for sim, simjob, entry in tasks))
         throttle = f"%{args.throttle}" if args.throttle else ""
         binds = " ".join(f"--bind {b}" for b in sorted({str(MUONCOLLIDER_DIR), str(out_base),
                                                         str(sd), str(BIB_DIR)}))
@@ -178,7 +225,7 @@ apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID \\
             if args.dry_run:
                 print(f"  [dry-run] {label}: {len(tasks)} task(s), script {script}, table {table}")
                 for sim, simjob, entry in tasks[:3]:
-                    print(f"      {sim.name} entry {entry} seed {seed(key, simjob, entry)}")
+                    print(f"      {sim.name} entry {entry} seed {task_seed(simjob, entry)}")
                 continue
             dep = [f"--dependency={args.dependency}"] if args.dependency else []
             r = subprocess.run(["sbatch", *dep, str(script)], capture_output=True, text=True, check=True)
@@ -194,6 +241,7 @@ apptainer exec --cleanenv --env SLURM_JOB_ID=$SLURM_JOB_ID \\
     if submitted:
         params = (f"--bib {n_bib} -e {args.nevents} --first-event {args.first_event} "
                   f"--events-per-job {epj} {' '.join(flags)} --mem {args.mem} --cpus {args.cpus}"
+                  + (f" --missing {args.missing}" if args.missing is not None else "")
                   + (f" --throttle {args.throttle}" if args.throttle else "")
                   + (f" --dependency {args.dependency}" if args.dependency else ""))
         lines = [f"- params: `{params.strip()}`  (BIB `{BIB_DIR}`, SIM `{SIM_TAG}` reused)",

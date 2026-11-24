@@ -232,6 +232,14 @@ The worktree is `../mucoll-slurm-v3.2`, kept separate so that v3.1 jobs queued f
   - Pass `--doOverlayFull` to RECO too. Its only effect there is to drop the hit
     collections (>1 GB/event with BIB).
   - The Yoke is not overlaid.
+  - **Set time and memory limits from the tail, never from the first tasks to finish** (those
+    are the fast events). At 100 % BIB, 10 h per 2 events lost 31 % of the VBF pt500 events and
+    12 h lost 30 % of vbfH pt0to100, and the loss depends on the boson's eta, so a production
+    with timeouts is a biased sample. Use 1 event per job (the output is only copied at the
+    end), 48 h and 32G (peak seen: 27 GB).
+  - `submit_bib.py --missing PAIR` resubmits only the events with no output, one per job, with
+    the seed of their original task (PAIR = events per job of the original production). Run it
+    with a Python that has uproot. Output dirs can then hold 1- and 2-event files.
 - **Calorimeter coning (`--calo-coning`) is a truth cone of 0.6 rad around every stable
   generator particle,** so it also cones the VBF tag neutrinos/muons a few degrees from the
   beam, where BIB is densest. **`--tagveto-coning`** (output `_ccnotag`) cones around the same

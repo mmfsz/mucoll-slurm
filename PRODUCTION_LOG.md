@@ -688,3 +688,105 @@ a red flag, not good news.
   tasks started. The tasks already running at the change read the old path, so
   `<KEY>_..._ccnt` is a symlink to `<KEY>_..._ccnotag` until they finish; then the symlinks
   are removed. Finished bench/val dirs were renamed. SLURM job and log names keep `_ccnt`.
+
+## 2026-11-22 15:17 — VBF pt500 `_ccnotag`: array throttle 150 → 250
+- 52355931–33: all pending tasks were held by `JobArrayTaskLimit` while the group used 1096 of
+  3870 avery-b CPUs. Raised to 250 per sample. Each task reads ~50 GB of BIB per event from
+  /blue (Lustre); ~600 tasks of ours ≈ 20 GB/s averaged — watch for slower tasks.
+
+## 2026-11-22 18:07 — VBF pt500 `_ccnotag`: array throttle removed (250 → none)
+- Pending tasks were again all `JobArrayTaskLimit`. Measured with ~820 of our jobs running:
+  BIB read 63–81 MB/s per task (≈11–12 min per event's 50 GB) vs ~95–115 MB/s unloaded, i.e.
+  ~7–9 % on task time. Concurrency now bounded by the group's avery-b memory (31 TB / 24 GB).
+
+## 2026-11-22 21:22:48 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 1 --tagveto-coning --mem 24G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt0to100_lhe_v3p2_bib1666_ccnotag`: array 52404098 (500 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt0to100_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-22 21:22:48 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt0to100_lhe_v3p2_bib0_ccnotag`: array 52404099 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt0to100_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-23 01:02:53 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 1 --tagveto-coning --mem 24G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfW_qq_pt0to100_lhe_v3p2_bib1666_ccnotag`: array 52427232 (500 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt0to100_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-23 01:02:53 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfW_qq_pt0to100_lhe_v3p2_bib0_ccnotag`: array 52427233 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt0to100_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-23 04:02:57 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 1 --tagveto-coning --mem 24G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt0to100_lhe_v3p2_bib1666_ccnotag`: array 52445370 (500 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt0to100_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-23 04:02:57 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt0to100_lhe_v3p2_bib0_ccnotag`: array 52445371 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt0to100_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-23 06:43:00 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 2 --tagveto-coning --mem 24G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt100to200_lhe_v3p2_bib1666_ccnotag`: array 52457530 (250 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt100to200_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-23 06:43:01 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt100to200_lhe_v3p2_bib0_ccnotag`: array 52457531 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt100to200_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-23 06:43:02 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 2 --tagveto-coning --mem 24G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfW_qq_pt100to200_lhe_v3p2_bib1666_ccnotag`: array 52457535 (250 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt100to200_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-23 06:43:03 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfW_qq_pt100to200_lhe_v3p2_bib0_ccnotag`: array 52457536 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt100to200_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-23 10:03:06 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 2 --tagveto-coning --mem 24G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt100to200_lhe_v3p2_bib1666_ccnotag`: array 52468781 (250 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt100to200_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-23 10:03:06 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt100to200_lhe_v3p2_bib0_ccnotag`: array 52468783 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt100to200_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-23 10:03:07 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 2 --tagveto-coning --mem 24G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt200to300_lhe_v3p2_bib1666_ccnotag`: array 52468785 (250 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt200to300_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-23 10:03:08 — submit_bib.py BIB digi+reco
+- commit: `d6464a1a3cdbab5d7dacbcd842d7dad66f61535a` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt200to300_lhe_v3p2_bib0_ccnotag`: array 52468786 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt200to300_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-23 14:45 — 100 % BIB timeouts; resubmission plan
+- Lost to time limits (or 4 OOM at 24G): ZH 28 events, vbfH/W/Z pt500 360/226/314 of 1000, vbfH/W
+  pt0to100 149/99 of 500. The 14 ZH timeouts come from the 24 h → 10 h cut of 2026-11-22, which
+  was applied to running tasks too. Completed-only samples are biased in boson eta: do not use
+  them until the missing events are in.
+- Resubmitted below with `--missing` (1 event per job, 32G, 48 h, original seeds). The slice
+  feeder was stopped; its last samples now use the same settings.
