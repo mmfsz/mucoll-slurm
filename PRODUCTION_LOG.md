@@ -815,3 +815,51 @@ a red flag, not good news.
 ## 2026-11-23 — slice feeder restarted after the `--missing` submissions
 - Remaining batches: vbfZ_qq_pt300to400, then pt400to500 (500 one-event tasks each, 48 h, 32G),
   one at a time when running+pending production tasks < 1000.
+
+## 2026-11-24 07:02:25 — submit_bib.py BIB digi+reco
+- commit: `cd8678139e03fce9828d898bbd57f573aa9e5226` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 1 --tagveto-coning --mem 32G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt300to400_lhe_v3p2_bib1666_ccnotag`: array 52567163 (500 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt300to400_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-24 07:02:25 — submit_bib.py BIB digi+reco
+- commit: `cd8678139e03fce9828d898bbd57f573aa9e5226` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt300to400_lhe_v3p2_bib0_ccnotag`: array 52567164 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt300to400_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-24 19:49 — pt500 `--missing` reruns moved to `avery`; limits lowered (in place)
+- Moved avery-b → avery, waiting tasks only: 52519130_[356-359] (vbfH), 52519131_[111-225] (vbfW),
+  52519132_[0-130] (vbfZ) = 250. Running cap 35 each on 52519131/52519132. The other 183 vbfZ
+  (131-313) follow once fewer than 250 are on avery (job 52672032, `output/bib_debug/bib_pt500_avery_rest.sh`).
+- Limits of waiting tasks: pt500 24 h / 28G; vbfH/W pt0to100 (52519434/5) 36 h / 28G. Basis: 475
+  finished reruns, 99 % under 17 h, max 18.8 h, peak RSS 23.8 GB. Running tasks unchanged.
+
+## 2026-11-25 08:22:48 — submit_bib.py BIB digi+reco
+- commit: `cd8678139e03fce9828d898bbd57f573aa9e5226` (clean)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 1 --tagveto-coning --mem 32G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt400to500_lhe_v3p2_bib1666_ccnotag`: array 52753919 (500 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt400to500_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-25 08:22:49 — submit_bib.py BIB digi+reco
+- commit: `cd8678139e03fce9828d898bbd57f573aa9e5226` (clean)
+- params: `--bib 0 -e 500 --first-event 0 --events-per-job 50 --tagveto-coning --mem 8G --cpus 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfZ_qq_pt400to500_lhe_v3p2_bib0_ccnotag`: array 52753920 (10 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt400to500_lhe_v3p2_bib0_ccnotag/`
+
+## 2026-11-26 13:43:12 — submit_bib.py BIB digi+reco
+- commit: `cd8678139e03fce9828d898bbd57f573aa9e5226` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 1 --tagveto-coning --mem 28G --cpus 2 --missing 1`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt0to100_lhe_v3p2_bib1666_ccnotag`: array 52932344 (6 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt0to100_lhe_v3p2_bib1666_ccnotag/`
+  - `vbfW_qq_pt0to100_lhe_v3p2_bib1666_ccnotag`: array 52932345 (3 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt0to100_lhe_v3p2_bib1666_ccnotag/`
+  - `vbfZ_qq_pt0to100_lhe_v3p2_bib1666_ccnotag`: array 52932346 (115 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt0to100_lhe_v3p2_bib1666_ccnotag/`
+
+## 2026-11-26 13:45:28 — submit_bib.py BIB digi+reco
+- commit: `cd8678139e03fce9828d898bbd57f573aa9e5226` (DIRTY — SHA does NOT capture the exact code)
+- params: `--bib 1666 -e 500 --first-event 0 --events-per-job 1 --tagveto-coning --mem 28G --cpus 2 --missing 2`  (BIB `/blue/avery/share/mucol/bib/BIB_v9`, SIM `v3p1` reused)
+- production:
+  - `vbfH_bb_pt100to200_lhe_v3p2_bib1666_ccnotag`: array 52932520 (234 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfH_bb_pt100to200_lhe_v3p2_bib1666_ccnotag/`
+  - `vbfW_qq_pt100to200_lhe_v3p2_bib1666_ccnotag`: array 52932521 (88 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfW_qq_pt100to200_lhe_v3p2_bib1666_ccnotag/`
+  - `vbfZ_qq_pt100to200_lhe_v3p2_bib1666_ccnotag`: array 52932522 (124 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt100to200_lhe_v3p2_bib1666_ccnotag/`
+  - `vbfZ_qq_pt200to300_lhe_v3p2_bib1666_ccnotag`: array 52932523 (72 tasks) → `/cmsuf/data/store/user/mmazza/mucoll/samples/vbfZ_qq_pt200to300_lhe_v3p2_bib1666_ccnotag/`

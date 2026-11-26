@@ -16,6 +16,7 @@ Examples:
 """
 import argparse
 import os
+import re
 import subprocess
 import sys
 import time
@@ -72,7 +73,7 @@ def parse_args():
                    help="submit only the events of the range with no output yet, one per task. PAIR is "
                         "the events-per-job of the original production: each event reuses the seed of "
                         "its original task. Counts the events in every file on disk (needs uproot) and "
-                        "refuses while jobs of the same sample are queued")
+                        "skips the events of running tasks and refuses while any task of the sample is pending")
     p.add_argument("--dry-run", action="store_true",
                    help="write the sbatch scripts, but neither the task tables nor any job")
     return p.parse_args()
@@ -109,11 +110,26 @@ def done_events(out_dir):
     return done
 
 
-def queued(key, n_bib):
-    """Number of queued tasks of this sample and BIB level, whatever their coning suffix."""
-    r = subprocess.run(["squeue", "-h", "-r", "-u", os.environ["USER"], "-o", "%j"],
-                       capture_output=True, text=True, check=True)
-    return sum(j.startswith(f"bib_{key}_{OUT_TAG}_bib{n_bib}_") for j in r.stdout.split())
+def queued(label, log_dir):
+    """Events held by the queued tasks of label, and the number of tasks that cannot be mapped.
+
+    A running task's log header names its sim file and entries; a pending task has no log yet.
+    """
+    r = subprocess.run(["squeue", "-h", "-r", "-u", os.environ["USER"], "-n", f"bib_{label}",
+                        "-o", "%F %K %T"], capture_output=True, text=True, check=True)
+    held, unmapped = set(), 0
+    for line in r.stdout.splitlines():
+        array, task, state = line.split()
+        log = log_dir / f"bib_{label}_{array}_{task}.out"
+        m = None
+        if state == "RUNNING" and log.exists():
+            m = re.search(r"sim_output_(\d+)\.edm4hep\.root entries \[(\d+), (\d+)\)",
+                          log.read_text(errors="replace")[:8000])
+        if m:
+            held.update(SIM_EVENTS_PER_JOB * int(m[1]) + e for e in range(int(m[2]), int(m[3])))
+        else:
+            unmapped += 1
+    return held, unmapped
 
 
 def main():
@@ -158,11 +174,14 @@ def main():
         tasks = []
         done = set()
         if args.missing is not None:
-            if n := queued(key, n_bib):
-                print(f"ERROR: {key}: {n} task(s) still queued; their events are not missing yet")
+            held, n = queued(f"{key}_{OUT_TAG}_{suffix}", out_base / "logs")
+            if n:
+                print(f"ERROR: {key}: {n} queued task(s) whose events are unknown (pending, or no log)")
                 ok = False
                 continue
-            done = done_events(out_base / f"{key}_{OUT_TAG}_{suffix}")
+            if held:
+                print(f"  {key}: {len(held)} event(s) held by running tasks, not resubmitted")
+            done = done_events(out_base / f"{key}_{OUT_TAG}_{suffix}") | held
         for first in range(args.first_event, args.first_event + args.nevents, epj):
             if first in done:
                 continue
